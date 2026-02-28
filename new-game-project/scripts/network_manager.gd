@@ -87,7 +87,11 @@ func _on_message_received(peer_id: int, message: String):
 			_handle_ping(peer_id)
 
 func _handle_join(peer_id: int, data: Dictionary):
-	if players.size() >= max_players:
+	# Check total player count (local + networked)
+	var total_players = players.size()
+	if PartyManager:
+		total_players = PartyManager.get_player_count()
+	if total_players >= max_players:
 		_send_error(peer_id, "Lobby full (max %d players)" % max_players)
 		return
 

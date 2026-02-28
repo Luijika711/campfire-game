@@ -149,6 +149,9 @@ func _spawn_player(player_data: PartyManager.PlayerData, spawn_index: int) -> vo
 	player.set_meta("player_id", player_data.player_id)
 	player.set_meta("player_color", player_data.player_color)
 
+	# Set team
+	player.team = player_data.team
+
 	# Add to scene
 	add_child(player)
 	players[player_data.player_id] = player

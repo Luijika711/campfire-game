@@ -31,12 +31,18 @@ func _ready():
 	if FileAccess.file_exists("res://assets/audio/ui_back.wav"):
 		ui_back_sound = load("res://assets/audio/ui_back.wav")
 
-	# Connect signals
+	# Connect PartyManager signals (local players)
 	PartyManager.player_joined.connect(_on_player_joined)
 	PartyManager.player_left.connect(_on_player_left)
 	PartyManager.player_changed_color.connect(_on_player_changed_color)
 	PartyManager.player_ready_changed.connect(_on_player_ready_changed)
+	PartyManager.player_changed_team.connect(_on_player_changed_team)
 	PartyManager.all_players_ready.connect(_on_all_players_ready)
+
+	# Connect NetworkManager signals (phone players)
+	if NetworkManager:
+		NetworkManager.player_connected.connect(_on_phone_player_connected)
+		NetworkManager.player_disconnected.connect(_on_phone_player_disconnected)
 
 	# Connect buttons
 	start_button.pressed.connect(_on_start_pressed)
@@ -66,6 +72,22 @@ func _input(event):
 				if player.input_device == "keyboard":
 					PartyManager.leave_player(player.player_id)
 					AudioManager.play_sfx(ui_leave_sound)
+					get_viewport().set_input_as_handled()
+					return
+
+		# Team cycle with T key
+		if event.keycode == KEY_T:
+			for player in PartyManager.get_all_players():
+				if player.input_device == "keyboard":
+					_cycle_player_team(player.player_id)
+					get_viewport().set_input_as_handled()
+					return
+
+		# Color cycle with C key
+		if event.keycode == KEY_C:
+			for player in PartyManager.get_all_players():
+				if player.input_device == "keyboard":
+					_cycle_player_color(player.player_id, 1)
 					get_viewport().set_input_as_handled()
 					return
 
@@ -107,6 +129,10 @@ func _input(event):
 					AudioManager.play_sfx(ui_ready_sound)
 					get_viewport().set_input_as_handled()
 					return
+				if event.button_index == JOY_BUTTON_Y:
+					_cycle_player_team(player.player_id)
+					get_viewport().set_input_as_handled()
+					return
 
 func _on_player_joined(player_data: PartyManager.PlayerData):
 	_create_player_slot(player_data)
@@ -132,8 +158,20 @@ func _on_player_ready_changed(player_id: int, is_ready: bool):
 	_update_start_button()
 
 func _on_all_players_ready():
-	# Auto-start when all ready (optional - can be disabled)
 	pass
+
+func _on_player_changed_team(player_id: int, team: int):
+	if player_slots.has(player_id):
+		player_slots[player_id].update_team(team)
+
+func _on_phone_player_connected(net_player_id: int, player_name: String, color: String, team: int):
+	var player_data = PartyManager.register_phone_player(net_player_id, player_name, color, team)
+	if player_data:
+		AudioManager.play_sfx(ui_join_sound)
+
+func _on_phone_player_disconnected(net_player_id: int):
+	PartyManager.remove_phone_player(net_player_id)
+	AudioManager.play_sfx(ui_leave_sound)
 
 func _create_player_slot(player_data: PartyManager.PlayerData):
 	var slot = PLAYER_SLOT_SCENE.instantiate()
@@ -181,6 +219,12 @@ func _cycle_player_color(player_id: int, direction: int):
 		PartyManager.change_player_color(player_id, colors[new_idx])
 		AudioManager.play_sfx(ui_color_sound)
 
+func _cycle_player_team(player_id: int):
+	var player = PartyManager.get_player(player_id)
+	if player:
+		var new_team = (player.team + 1) % 3  # 0=None, 1=Red, 2=Blue
+		PartyManager.change_player_team(player_id, new_team)
+
 func _update_start_button():
 	var player_count = PartyManager.get_player_count()
 	var all_ready = player_count > 0
@@ -201,9 +245,9 @@ func _update_start_button():
 func _update_instructions():
 	var player_count = PartyManager.get_player_count()
 	if player_count == 0:
-		instructions_label.text = "Press ENTER (Keyboard) or A Button (Gamepad) to Join!"
+		instructions_label.text = "Press ENTER / A Button to Join"
 	else:
-		instructions_label.text = "Use Shoulder Buttons to Change Color, X Button to Ready Up"
+		instructions_label.text = "C/Shoulder = Color | T/Y = Team | ESC/B = Leave"
 
 func _on_start_pressed():
 	AudioManager.play_sfx(ui_start_sound)

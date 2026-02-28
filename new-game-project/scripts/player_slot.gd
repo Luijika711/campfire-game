@@ -27,6 +27,7 @@ func setup(player_data: PartyManager.PlayerData):
 	device_label.text = device_name
 	update_color(player_data.player_color)
 	update_ready(player_data.is_ready)
+	update_team(player_data.team)
 
 func update_color(new_color: Color):
 	current_color = new_color
@@ -52,3 +53,9 @@ func _on_ready_toggled(button_pressed: bool):
 
 func _on_leave_pressed():
 	leave_pressed.emit(player_id)
+
+func update_team(team: int):
+	var team_name = TeamManager.get_team_name(team) if TeamManager else "None"
+	device_label.text = device_label.text.split(" |")[0]  # Keep device name
+	if team > 0:
+		device_label.text += " | " + team_name

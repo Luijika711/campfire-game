@@ -3,11 +3,12 @@ extends Node
 # Player data structure
 class PlayerData:
 	var player_id: int
-	var input_device: String  # "keyboard", "gamepad_0", "gamepad_1", etc.
+	var input_device: String  # "keyboard", "gamepad", "phone"
 	var device_id: int  # For gamepads: 0, 1, 2, etc. For keyboard: -1
 	var player_color: Color
 	var player_name: String
 	var is_ready: bool = false
+	var team: int = 0  # 0=None, 1=Red, 2=Blue
 
 	func _init(id: int, device: String, dev_id: int, color: Color, name: String):
 		player_id = id
@@ -21,6 +22,7 @@ signal player_joined(player_data: PlayerData)
 signal player_left(player_id: int)
 signal player_changed_color(player_id: int, new_color: Color)
 signal player_ready_changed(player_id: int, is_ready: bool)
+signal player_changed_team(player_id: int, team: int)
 signal all_players_ready
 
 # Constants
@@ -99,6 +101,53 @@ func change_player_color(player_id: int, new_color: Color) -> void:
 			player_changed_color.emit(player_id, new_color)
 			return
 
+# Change player team
+func change_player_team(player_id: int, team: int) -> void:
+	for player in joined_players:
+		if player.player_id == player_id:
+			player.team = team
+			player_changed_team.emit(player_id, team)
+			return
+
+# Register a phone player from NetworkManager into the party
+func register_phone_player(net_player_id: int, player_name: String, color_name: String, team: int) -> PlayerData:
+	if joined_players.size() >= MAX_PLAYERS:
+		return null
+
+	var player_color = _color_name_to_color(color_name)
+	var player_data = PlayerData.new(next_player_id, "phone", net_player_id, player_color, player_name)
+	player_data.team = team
+	player_data.is_ready = true
+	joined_players.append(player_data)
+	next_player_id += 1
+
+	player_joined.emit(player_data)
+	player_ready_changed.emit(player_data.player_id, true)
+	check_all_ready()
+
+	return player_data
+
+# Remove a phone player by network ID
+func remove_phone_player(net_player_id: int) -> void:
+	for i in range(joined_players.size()):
+		if joined_players[i].input_device == "phone" and joined_players[i].device_id == net_player_id:
+			var pid = joined_players[i].player_id
+			joined_players.remove_at(i)
+			player_left.emit(pid)
+			return
+
+func _color_name_to_color(color_name: String) -> Color:
+	match color_name.to_lower():
+		"red": return DEFAULT_COLORS[0]
+		"blue": return DEFAULT_COLORS[1]
+		"green": return DEFAULT_COLORS[2]
+		"yellow": return DEFAULT_COLORS[3]
+		"magenta", "purple": return DEFAULT_COLORS[4]
+		"cyan": return DEFAULT_COLORS[5]
+		"orange": return DEFAULT_COLORS[6]
+		"pink": return DEFAULT_COLORS[7]
+		_: return get_next_available_color()
+
 # Toggle player ready state
 func toggle_player_ready(player_id: int) -> void:
 	for player in joined_players:
@@ -159,6 +208,8 @@ func get_device_display_name(device_type: String, device_id: int) -> String:
 			return "Keyboard/Mouse"
 		"gamepad":
 			return "Gamepad " + str(device_id + 1)
+		"phone":
+			return "Phone"
 		_:
 			return device_type
 

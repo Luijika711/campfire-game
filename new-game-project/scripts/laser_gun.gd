@@ -18,8 +18,6 @@ func _ready() -> void:
 	super._ready()
 	weapon_name = "Laser Gun"
 	weapon_type = WeaponType.LASER_GUN
-	damage = 50
-	cooldown = 0.15  # Fast firing
 	current_ammo = max_ammo
 
 	# Create laser beam
@@ -77,68 +75,74 @@ func _fire_laser(direction: Vector2) -> void:
 	var start_pos = global_position
 	var end_pos = start_pos + direction * laser_range
 
-	# Raycast to hit ALL enemies along the path (passes through everything)
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsRayQueryParameters2D.create(start_pos, end_pos)
-	query.collision_mask = 4 | 1  # Hit enemies and players
-	query.exclude = [player]
-	query.hit_from_inside = true
+	query.collision_mask = 4 | 1 | 2  # Hit enemies, players, and walls
+	if player:
+		query.exclude = [player.get_rid()]
+	query.hit_from_inside = false
 
-	var result = space_state.intersect_ray(query)
-	var hit_pos = end_pos
-
-	# Draw laser to end position (infinite range visual)
+	# Draw laser beam
 	laser_beam.points = PackedVector2Array([to_local(start_pos), to_local(end_pos)])
 	laser_beam.visible = true
+	if glow_beam:
+		glow_beam.points = laser_beam.points
+		glow_beam.visible = true
 
-	# Deal damage to ALL enemies hit along the beam
-	var current_start = start_pos
-	var max_hits = 20  # Prevent infinite loop
+	# Deal damage to targets along the beam, stop at walls
+	var max_penetrations = 3
 	var hits = 0
 
-	while hits < max_hits:
-		query.from = current_start
+	while hits < max_penetrations:
+		query.from = start_pos
 		query.to = end_pos
-		result = space_state.intersect_ray(query)
+		var result = space_state.intersect_ray(query)
 
-		if result:
-			var collider = result.collider
-			hit_pos = result.position
+		if not result:
+			break
 
-			# Exclude this collider from future raycasts to avoid multi-hit
-			query.exclude.append(collider.get_rid())
+		var collider = result.collider
+		var hit_pos = result.position
 
-			if collider != player and collider.is_in_group("enemies"):
-				# Deal damage to enemy AI
+		query.exclude.append(collider.get_rid())
+
+		# Stop at walls
+		if collider.is_in_group("walls") or collider is TileMapLayer or collider is StaticBody2D:
+			# Shorten laser visual to wall hit point
+			laser_beam.points = PackedVector2Array([to_local(start_pos), to_local(hit_pos)])
+			if glow_beam:
+				glow_beam.points = laser_beam.points
+			_show_hit_at(hit_pos)
+			break
+
+		if collider.is_in_group("enemies"):
+			if collider.has_method("take_damage"):
+				collider.take_damage(damage, player)
+			_show_hit_at(hit_pos)
+			hits += 1
+		elif collider.is_in_group("players"):
+			if TeamManager and TeamManager.are_enemies(player, collider):
 				if collider.has_method("take_damage"):
 					collider.take_damage(damage, player)
 				_show_hit_at(hit_pos)
-				hits += 1
-			elif collider != player and collider.is_in_group("players"):
-				# Team-aware player damage
-				if TeamManager and TeamManager.are_enemies(player, collider):
-					if collider.has_method("take_damage"):
-						collider.take_damage(damage, player)
-					_show_hit_at(hit_pos)
-				hits += 1
-			else:
-				hits += 1
+			hits += 1
 		else:
+			# Unknown collider, stop beam
+			laser_beam.points = PackedVector2Array([to_local(start_pos), to_local(hit_pos)])
+			if glow_beam:
+				glow_beam.points = laser_beam.points
 			break
 
-	# Screen shake
+	# Recoil
 	if player:
 		player.velocity -= direction * 50
 
-	# Hide laser
+	# Hide laser after beam duration
 	await get_tree().create_timer(beam_duration).timeout
 	laser_beam.visible = false
 	if glow_beam:
 		glow_beam.visible = false
 	is_firing = false
-
-	start_cooldown()
-	weapon_fired.emit()
 
 func _show_hit_at(pos: Vector2) -> void:
 	var effect = Polygon2D.new()

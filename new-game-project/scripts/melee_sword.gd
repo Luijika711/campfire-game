@@ -22,7 +22,7 @@ func _ready() -> void:
 	hitbox = Area2D.new()
 	hitbox.name = "SwordHitbox"
 	hitbox.collision_layer = 0
-	hitbox.collision_mask = 6  # Hit enemies and platforms
+	hitbox.collision_mask = 6 | 1  # Hit enemies, platforms, and players
 	add_child(hitbox)
 
 	var collision_shape = CollisionShape2D.new()
@@ -100,7 +100,15 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body == player:
 		return
 
-	# Apply damage to enemies
+	# Team-aware player damage
+	if body.is_in_group("players"):
+		if TeamManager and player:
+			if not TeamManager.are_enemies(player, body):
+				return  # Skip allies
+		else:
+			return  # No team info: skip players
+
+	# Apply damage
 	if body.has_node("HealthComponent"):
 		var health = body.get_node("HealthComponent")
 		health.take_damage(damage, player)

@@ -80,7 +80,7 @@ func _fire_laser(direction: Vector2) -> void:
 	# Raycast to hit ALL enemies along the path (passes through everything)
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsRayQueryParameters2D.create(start_pos, end_pos)
-	query.collision_mask = 4  # Only hit enemies layer
+	query.collision_mask = 4 | 1  # Hit enemies and players
 	query.exclude = [player]
 	query.hit_from_inside = true
 
@@ -106,18 +106,23 @@ func _fire_laser(direction: Vector2) -> void:
 			hit_pos = result.position
 
 			if collider != player and collider.is_in_group("enemies"):
-				# Deal damage to enemy
+				# Deal damage to enemy AI
 				if collider.has_method("take_damage"):
 					collider.take_damage(damage, player)
-
-				# Show hit effect at this position briefly
 				_show_hit_at(hit_pos)
-
-				# Continue past this enemy
+				current_start = hit_pos + direction * 5
+				hits += 1
+			elif collider != player and collider.is_in_group("players"):
+				# Team-aware player damage
+				if TeamManager and TeamManager.are_enemies(player, collider):
+					if collider.has_method("take_damage"):
+						collider.take_damage(damage, player)
+					_show_hit_at(hit_pos)
+				# Continue past player regardless
 				current_start = hit_pos + direction * 5
 				hits += 1
 			else:
-				# Not an enemy, ignore and continue
+				# Not an enemy or player, ignore and continue
 				current_start = hit_pos + direction * 5
 				hits += 1
 		else:

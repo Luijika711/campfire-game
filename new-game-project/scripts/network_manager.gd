@@ -8,7 +8,7 @@ var peers: Dictionary = {}
 var players: Dictionary = {}
 var next_player_id: int = 1
 
-signal player_connected(player_id: int, name: String, color: String)
+signal player_connected(player_id: int, name: String, color: String, team: int)
 signal player_disconnected(player_id: int)
 signal player_input(
 	player_id: int, move_x: float, move_y: float, aim_x: float,
@@ -93,23 +93,28 @@ func _handle_join(peer_id: int, data: Dictionary):
 
 	var player_name = data.get("name", "Player %d" % next_player_id)
 	var color = data.get("color", "Red")
+	var team = int(data.get("team", 0))
 	var player_id = next_player_id
 	next_player_id += 1
 
 	players[peer_id] = {
 		"id": player_id,
 		"name": player_name,
-		"color": color
+		"color": color,
+		"team": team
 	}
 
 	_send_message(peer_id, {
 		"type": "connected",
 		"player_id": player_id,
-		"color": color
+		"color": color,
+		"team": team
 	})
 
-	player_connected.emit(player_id, player_name, color)
-	print("Player %d joined: %s (%s)" % [player_id, player_name, color])
+	player_connected.emit(player_id, player_name, color, team)
+	var tname = TeamManager.get_team_name(team) if TeamManager else str(team)
+	print("Player %d joined: %s (%s) - %s" % [
+		player_id, player_name, color, tname])
 
 func _handle_input(peer_id: int, data: Dictionary):
 	if not players.has(peer_id):

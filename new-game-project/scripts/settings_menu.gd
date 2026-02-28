@@ -2,15 +2,15 @@ extends Control
 
 var click_sound: AudioStream = null
 
-@onready var master_slider: HSlider = $VBoxContainer/AudioSection/MasterSlider
-@onready var music_slider: HSlider = $VBoxContainer/AudioSection/MusicSlider
-@onready var sfx_slider: HSlider = $VBoxContainer/AudioSection/SFXSlider
-@onready var fullscreen_check: CheckBox = $VBoxContainer/GraphicsSection/FullscreenCheck
-@onready var vsync_check: CheckBox = $VBoxContainer/GraphicsSection/VSyncCheck
-@onready var show_fps_check: CheckBox = $VBoxContainer/GraphicsSection/ShowFPSCheck
-@onready var player_name_input: LineEdit = $VBoxContainer/GameSection/PlayerNameInput
-@onready var save_button: Button = $VBoxContainer/SaveButton
-@onready var back_button: Button = $VBoxContainer/BackButton
+@onready var master_slider: HSlider = $Panel/VBoxContainer/AudioSection/MasterSlider
+@onready var music_slider: HSlider = $Panel/VBoxContainer/AudioSection/MusicSlider
+@onready var sfx_slider: HSlider = $Panel/VBoxContainer/AudioSection/SFXSlider
+@onready var fullscreen_check: CheckBox = $Panel/VBoxContainer/GraphicsSection/FullscreenCheck
+@onready var vsync_check: CheckBox = $Panel/VBoxContainer/GraphicsSection/VSyncCheck
+@onready var show_fps_check: CheckBox = $Panel/VBoxContainer/GraphicsSection/ShowFPSCheck
+@onready var player_name_input: LineEdit = $Panel/VBoxContainer/GameSection/PlayerNameInput
+@onready var save_button: Button = $Panel/VBoxContainer/SaveButton
+@onready var back_button: Button = $Panel/VBoxContainer/BackButton
 
 func _ready():
 	# Load click sound if it exists

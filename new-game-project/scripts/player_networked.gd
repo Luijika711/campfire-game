@@ -15,6 +15,8 @@ extends CharacterBody2D
 var player_id: int = -1
 var player_name: String = "Player"
 var player_color: String = "Red"
+var team: int = 0  # TeamManager.Team.NONE
+var character_scale: float = 1.0
 var jumps_remaining: int = 2
 var is_dead: bool = false
 
@@ -37,22 +39,35 @@ const COLOR_MAP = {
 	"Pink": Color(1.0, 0.53, 0.67),
 }
 
-func setup_player(id: int, p_name: String, color: String):
+func setup_player(id: int, p_name: String, color: String, p_team: int = 0):
 	player_id = id
 	player_name = p_name
 	player_color = color
+	team = p_team
+
+	# Apply character scale
+	if character_scale != 1.0:
+		scale = Vector2(character_scale, character_scale)
+
+	# Register team
+	if TeamManager:
+		TeamManager.set_team(self, team)
 
 	# Setup visual and nametag (call_deferred ensures nodes are ready)
-	call_deferred("_apply_setup", color, p_name)
+	call_deferred("_apply_setup", color, p_name, p_team)
 
-func _apply_setup(color: String, p_name: String):
+func _apply_setup(color: String, p_name: String, p_team: int = 0):
 	# Set visual color
 	if visual and COLOR_MAP.has(color):
 		visual.modulate = COLOR_MAP[color]
 
-	# Setup nametag
+	# Setup nametag with team
 	if nametag:
-		nametag.text = p_name
+		var team_tag = TeamManager.get_team_name(p_team) if TeamManager else ""
+		if team_tag != "None" and team_tag != "":
+			nametag.text = "[%s] %s" % [team_tag, p_name]
+		else:
+			nametag.text = p_name
 
 	# Initialize health
 	if health_component:
@@ -154,7 +169,11 @@ func take_damage(amount: int, source: Node = null) -> void:
 func _on_health_changed(current: int, max: int) -> void:
 	# Update nametag to show health
 	if nametag:
-		nametag.text = "%s [%d/%d]" % [player_name, current, max]
+		var team_tag = TeamManager.get_team_name(team) if TeamManager else ""
+		var prefix = ""
+		if team_tag != "None" and team_tag != "":
+			prefix = "[%s] " % team_tag
+		nametag.text = "%s%s [%d/%d]" % [prefix, player_name, current, max]
 
 func _on_health_depleted() -> void:
 	die()
@@ -165,6 +184,11 @@ func _on_weapon_changed(_weapon: Weapon) -> void:
 
 func collect_coin() -> void:
 	GameManager.add_coin()
+
+func set_team(new_team: int) -> void:
+	team = new_team
+	if TeamManager:
+		TeamManager.set_team(self, team)
 
 func die() -> void:
 	if is_dead:

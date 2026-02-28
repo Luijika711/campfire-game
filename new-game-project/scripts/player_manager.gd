@@ -25,7 +25,7 @@ func _ready():
 		NetworkManager.player_disconnected.connect(_on_player_disconnected)
 		NetworkManager.player_input.connect(_on_player_input)
 
-func _on_player_connected(player_id: int, player_name: String, color: String):
+func _on_player_connected(player_id: int, player_name: String, color: String, team: int = 0):
 	# Assign a random available color if the chosen one is taken
 	var assigned_color = color
 	if used_colors.has(color):
@@ -42,7 +42,7 @@ func _on_player_connected(player_id: int, player_name: String, color: String):
 	var player = player_scene.instantiate()
 	player.name = "Player_%d" % player_id
 	player.position = spawn_pos
-	player.setup_player(player_id, player_name, assigned_color)
+	player.setup_player(player_id, player_name, assigned_color, team)
 
 	add_child(player)
 	players[player_id] = player
@@ -53,6 +53,8 @@ func _on_player_disconnected(player_id: int):
 	if players.has(player_id):
 		var player = players[player_id]
 		used_colors.erase(player.player_color)
+		if TeamManager:
+			TeamManager.remove_player(player)
 		player.queue_free()
 		players.erase(player_id)
 		print("Removed player %d" % player_id)

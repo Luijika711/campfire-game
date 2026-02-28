@@ -12,6 +12,8 @@ extends CharacterBody2D
 @export var double_tap_window: float = 0.35
 
 @export var max_health: int = 100
+@export var team: int = 0  # TeamManager.Team.NONE
+@export var character_scale: float = 1.0
 
 @onready var visual: Sprite2D = $Sprite2D
 @onready var health_component: HealthComponent = $HealthComponent
@@ -47,6 +49,14 @@ signal weapon_changed(weapon: Weapon)
 func _ready() -> void:
 	floor_snap_length = 8.0
 	add_to_group("players")
+
+	# Apply character scale
+	if character_scale != 1.0:
+		scale = Vector2(character_scale, character_scale)
+
+	# Register team
+	if TeamManager:
+		TeamManager.set_team(self, team)
 
 	# Initialize health
 	if health_component:
@@ -277,6 +287,11 @@ func get_current_weapon() -> Weapon:
 func heal(amount: int) -> void:
 	if health_component:
 		health_component.heal(amount)
+
+func set_team(new_team: int) -> void:
+	team = new_team
+	if TeamManager:
+		TeamManager.set_team(self, team)
 
 func _handle_weapon_attack() -> void:
 	# Get aim direction from mouse

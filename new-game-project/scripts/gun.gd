@@ -56,12 +56,12 @@ func perform_attack(direction: Vector2) -> void:
 		var bullet_direction = direction.rotated(spread)
 
 		var spawn_pos = global_position + bullet_direction * muzzle_offset
-		bullet.setup(bullet_direction, spawn_pos, damage)
+		bullet.setup(bullet_direction, spawn_pos, damage, player)
 
-		# Set bullet to damage enemies
+		# Set bullet to damage enemies and players
 		bullet.add_to_group("player_bullets")
 		bullet.collision_layer = 8
-		bullet.collision_mask = 4 | 2 | 8  # Hit enemies, platforms, and hazards
+		bullet.collision_mask = 4 | 2 | 8 | 1  # Hit enemies, platforms, hazards, and players
 
 		get_tree().current_scene.add_child(bullet)
 

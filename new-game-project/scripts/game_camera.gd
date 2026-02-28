@@ -6,6 +6,8 @@ extends Camera2D
 @export var max_zoom: float = 1.0
 @export var zoom_margin: float = 200.0
 @export var smooth_speed: float = 5.0
+@export var camera_offset: Vector2 = Vector2.ZERO
+@export var enable_zoom: bool = true
 
 var _host_player: CharacterBody2D
 var _player_manager: Node2D
@@ -43,15 +45,16 @@ func _process(delta: float) -> void:
 		rect = rect.expand(pos)
 
 	# Center on midpoint of all players
-	var target_pos := rect.get_center()
+	var target_pos := rect.get_center() + camera_offset
 	global_position = global_position.lerp(target_pos, smooth_speed * delta)
 
 	# Zoom to fit everyone with margin
-	var needed_width := rect.size.x + zoom_margin * 2.0
-	var needed_height := rect.size.y + zoom_margin * 2.0
-	var zoom_x := _viewport_size.x / needed_width
-	var zoom_y := _viewport_size.y / needed_height
-	var target_zoom := clampf(min(zoom_x, zoom_y), min_zoom, max_zoom)
-	zoom = zoom.lerp(
-		Vector2(target_zoom, target_zoom), smooth_speed * delta
-	)
+	if enable_zoom:
+		var needed_width := rect.size.x + zoom_margin * 2.0
+		var needed_height := rect.size.y + zoom_margin * 2.0
+		var zoom_x := _viewport_size.x / needed_width
+		var zoom_y := _viewport_size.y / needed_height
+		var target_zoom := clampf(min(zoom_x, zoom_y), min_zoom, max_zoom)
+		zoom = zoom.lerp(
+			Vector2(target_zoom, target_zoom), smooth_speed * delta
+		)

@@ -15,6 +15,11 @@ const COLORS = [
   { name: "Pink", value: "#FF88AA", bg: "bg-pink-400" },
 ];
 
+const TEAMS = [
+  { name: "Red Team", value: 1, bg: "bg-red-600", ring: "ring-red-300" },
+  { name: "Blue Team", value: 2, bg: "bg-blue-600", ring: "ring-blue-300" },
+];
+
 export default function ControllerPage() {
   const searchParams = useSearchParams();
   const [wsUrl, setWsUrl] = useState<string>("");
@@ -24,6 +29,7 @@ export default function ControllerPage() {
   const [error, setError] = useState<string>("");
   const [playerName, setPlayerName] = useState("");
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+  const [selectedTeam, setSelectedTeam] = useState(TEAMS[0]);
   const [joined, setJoined] = useState(false);
 
   // Input states
@@ -99,6 +105,7 @@ export default function ControllerPage() {
             type: "join",
             name: playerName.trim(),
             color: selectedColor.name,
+            team: selectedTeam.value,
           })
         );
       };
@@ -141,7 +148,7 @@ export default function ControllerPage() {
       setConnecting(false);
       setError("Failed to create connection");
     }
-  }, [wsUrl, playerName, selectedColor]);
+  }, [wsUrl, playerName, selectedColor, selectedTeam]);
 
   useEffect(() => {
     return () => {
@@ -245,6 +252,26 @@ export default function ControllerPage() {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <label className="text-gray-400 text-sm">Choose Team</label>
+            <div className="grid grid-cols-2 gap-3">
+              {TEAMS.map((team) => (
+                <button
+                  key={team.name}
+                  onClick={() => setSelectedTeam(team)}
+                  disabled={connecting}
+                  className={`py-3 rounded-lg font-bold text-white ${team.bg} ${
+                    selectedTeam.value === team.value
+                      ? `ring-4 ${team.ring}`
+                      : "opacity-60"
+                  } ${connecting ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {team.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={connect}
             disabled={!playerName.trim() || !wsUrl || connecting}
@@ -278,6 +305,9 @@ export default function ControllerPage() {
             }`}
           />
           <span className="text-white font-medium">{playerName}</span>
+          <span className={`text-xs px-2 py-0.5 rounded ${selectedTeam.bg} text-white`}>
+            {selectedTeam.name}
+          </span>
         </div>
         <div
           className={`w-6 h-6 rounded-full ${selectedColor.bg}`}

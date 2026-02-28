@@ -5,6 +5,8 @@ extends Area2D
 
 var direction: Vector2 = Vector2.RIGHT
 var damage: int = 1
+var shooter: Node = null
+var shooter_team: int = 0  # TeamManager.Team.NONE
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -20,21 +22,33 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	position += direction * speed * delta
 
-func setup(dir: Vector2, start_pos: Vector2, bullet_damage: int = 1) -> void:
+func setup(
+	dir: Vector2, start_pos: Vector2,
+	bullet_damage: int = 1, bullet_shooter: Node = null
+) -> void:
 	direction = dir.normalized()
 	position = start_pos
 	damage = bullet_damage
+	shooter = bullet_shooter
+	if shooter and TeamManager:
+		shooter_team = TeamManager.get_team(shooter)
 
 	# Rotate sprite to face direction
 	rotation = direction.angle()
 
 func _on_body_entered(body: Node2D) -> void:
 	# Don't hit the shooter
-	if body == get_parent():
+	if body == shooter:
 		return
 
-	# Don't damage players
+	# Team-aware player damage
 	if body.is_in_group("players"):
+		if TeamManager and shooter:
+			if TeamManager.are_enemies(shooter, body):
+				if body.has_method("take_damage"):
+					body.take_damage(damage, self)
+				_destroy_with_effect()
+			# Allies: bullet passes through (no destroy)
 		return
 
 	# Deal damage to enemies

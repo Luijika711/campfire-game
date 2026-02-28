@@ -19,6 +19,7 @@ const LEVELS_DIR := "res://scenes/levels/"
 @onready var weapon_2_label: Label = $CanvasLayer/UI/Weapon2Label
 @onready var weapon_3_label: Label = $CanvasLayer/UI/Weapon3Label
 @onready var pause_menu: Control = $CanvasLayer/PauseMenu
+@onready var team_label: Label
 
 func _ready() -> void:
 	# Setup camera
@@ -47,6 +48,9 @@ func _ready() -> void:
 
 	# Connect to host player health and weapon signals
 	if host_player:
+		# Assign host to Team Red by default
+		host_player.set_team(TeamManager.Team.TEAM_RED)
+
 		host_player.health_changed.connect(_on_player_health_changed)
 		host_player.weapon_changed.connect(_on_weapon_changed)
 
@@ -61,6 +65,9 @@ func _ready() -> void:
 
 	# Update weapon UI
 	_update_weapon_ui()
+
+	# Create team label dynamically
+	_create_team_label()
 
 	# Initial player count (just host)
 	_update_player_count()
@@ -143,7 +150,10 @@ func _on_coins_changed(new_count: int) -> void:
 func _update_coin_label(count: int) -> void:
 	coin_label.text = "Coins: %d" % count
 
-func _on_player_connected(_player_id: int, player_name: String, _color: String) -> void:
+func _on_player_connected(
+	_player_id: int, player_name: String,
+	_color: String, _team: int = 0
+) -> void:
 	_update_player_count()
 	print("Player joined: %s" % player_name)
 
@@ -203,3 +213,32 @@ func _update_weapon_ui() -> void:
 					label.text = prefix + "[%d] Gun: %s" % [i + 1, weapon.get_ammo_text()]
 				Weapon.WeaponType.LASER_GUN:
 					label.text = prefix + "[%d] Laser: %s" % [i + 1, weapon.get_ammo_text()]
+
+func _create_team_label() -> void:
+	team_label = Label.new()
+	team_label.name = "TeamLabel"
+	team_label.anchors_preset = 1  # Top-right
+	team_label.anchor_left = 1.0
+	team_label.anchor_right = 1.0
+	team_label.offset_left = -200.0
+	team_label.offset_top = 135.0
+	team_label.offset_right = -20.0
+	team_label.offset_bottom = 160.0
+	team_label.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	team_label.add_theme_font_size_override("font_size", 18)
+	team_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+	var ui = $CanvasLayer/UI
+	if ui:
+		ui.add_child(team_label)
+
+	_update_team_label()
+
+func _update_team_label() -> void:
+	if not team_label or not host_player or not TeamManager:
+		return
+	var team = TeamManager.get_team(host_player)
+	var team_name = TeamManager.get_team_name(team)
+	var team_color = TeamManager.get_team_color(team)
+	team_label.text = "Team: %s" % team_name
+	team_label.add_theme_color_override("font_color", team_color)

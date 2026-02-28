@@ -44,6 +44,18 @@ var is_dead: bool = false
 var is_attacking: bool = false
 var facing_direction: String = "right"
 
+# Device-specific input
+var input_device: String = "keyboard"
+var device_id: int = -1
+var _action_states: Dictionary = {}
+var _action_just_pressed: Dictionary = {}
+var _action_just_released: Dictionary = {}
+var _joy_move_axis: float = 0.0
+var _joy_aim: Vector2 = Vector2.ZERO
+
+# Aim indicator
+var aim_indicator: Polygon2D = null
+
 signal player_died
 signal health_changed(current: int, max: int)
 signal weapon_changed(weapon: Weapon)
@@ -73,7 +85,119 @@ func _ready() -> void:
 	# Connect animation finished signal
 	visual.animation_finished.connect(_on_animation_finished)
 
+	# Initialize device-specific input
+	input_device = get_meta("input_device", "keyboard")
+	device_id = get_meta("device_id", -1)
+
+	# Create aim indicator
+	_create_aim_indicator()
+
 	is_dead = false
+
+# --- Device-specific input handling ---
+
+func _input(event: InputEvent) -> void:
+	if is_dead:
+		return
+	if input_device == "keyboard":
+		_handle_keyboard_input(event)
+	elif input_device == "gamepad":
+		_handle_gamepad_input(event)
+
+func _handle_keyboard_input(event: InputEvent) -> void:
+	if not (event is InputEventKey or event is InputEventMouseButton):
+		return
+	for action in ["move_left", "move_right", "jump", "shoot", "move_down"]:
+		if event.is_action(action):
+			var pressed = event.is_pressed()
+			var was = _action_states.get(action, false)
+			if pressed and not was:
+				_action_just_pressed[action] = true
+			elif not pressed and was:
+				_action_just_released[action] = true
+			_action_states[action] = pressed
+
+func _handle_gamepad_input(event: InputEvent) -> void:
+	if event is InputEventJoypadButton and event.device == device_id:
+		var action = _joy_button_to_action(event.button_index)
+		if action != "":
+			var was = _action_states.get(action, false)
+			if event.pressed and not was:
+				_action_just_pressed[action] = true
+			elif not event.pressed and was:
+				_action_just_released[action] = true
+			_action_states[action] = event.pressed
+	elif event is InputEventJoypadMotion and event.device == device_id:
+		_handle_joy_axis(event)
+
+func _joy_button_to_action(button: int) -> String:
+	match button:
+		JOY_BUTTON_A: return "jump"
+		JOY_BUTTON_RIGHT_SHOULDER: return "shoot"
+		JOY_BUTTON_B: return "shoot"
+		JOY_BUTTON_X: return "weapon_next"
+		JOY_BUTTON_Y: return "weapon_prev"
+		JOY_BUTTON_DPAD_DOWN: return "move_down"
+	return ""
+
+func _handle_joy_axis(event: InputEventJoypadMotion) -> void:
+	match event.axis:
+		JOY_AXIS_LEFT_X:
+			var old = _joy_move_axis
+			var val = event.axis_value if abs(event.axis_value) > 0.2 else 0.0
+			_joy_move_axis = val
+			# Track just_pressed for dash detection
+			if val < -0.5 and old >= -0.5:
+				_action_just_pressed["move_left"] = true
+			if val > 0.5 and old <= 0.5:
+				_action_just_pressed["move_right"] = true
+		JOY_AXIS_LEFT_Y:
+			_action_states["move_down"] = event.axis_value > 0.5
+		JOY_AXIS_RIGHT_X:
+			_joy_aim.x = event.axis_value if abs(event.axis_value) > 0.15 else 0.0
+		JOY_AXIS_RIGHT_Y:
+			_joy_aim.y = event.axis_value if abs(event.axis_value) > 0.15 else 0.0
+		JOY_AXIS_TRIGGER_RIGHT:
+			var pressed = event.axis_value > 0.5
+			var was = _action_states.get("shoot", false)
+			if pressed and not was:
+				_action_just_pressed["shoot"] = true
+			elif not pressed and was:
+				_action_just_released["shoot"] = true
+			_action_states["shoot"] = pressed
+
+func _pressed(action: String) -> bool:
+	return _action_states.get(action, false)
+
+func _just_pressed(action: String) -> bool:
+	return _action_just_pressed.get(action, false)
+
+func _just_released(action: String) -> bool:
+	return _action_just_released.get(action, false)
+
+func _get_move_x() -> float:
+	if input_device == "gamepad":
+		return _joy_move_axis
+	var left = 1.0 if _action_states.get("move_left", false) else 0.0
+	var right = 1.0 if _action_states.get("move_right", false) else 0.0
+	return right - left
+
+func _get_aim_direction() -> Vector2:
+	if input_device == "gamepad":
+		if _joy_aim.length() > 0.1:
+			return _joy_aim.normalized()
+		if abs(_joy_move_axis) > 0.2:
+			return Vector2(_joy_move_axis, 0).normalized()
+		return last_aim_direction
+	else:
+		var mouse_pos = get_global_mouse_position()
+		return (mouse_pos - global_position).normalized()
+
+func _clear_just_states() -> void:
+	_action_just_pressed.clear()
+	_action_just_released.clear()
+
+# --- Main loop ---
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -89,13 +213,15 @@ func _physics_process(delta: float) -> void:
 			can_dash = true
 		move_and_slide()
 		_update_animation()
+		_update_aim_indicator()
+		_clear_just_states()
 		return
 
 	# Get movement input
-	var direction := Input.get_axis("move_left", "move_right")
+	var direction := _get_move_x()
 
 	# Check for jump input first (before slope handling)
-	if Input.is_action_just_pressed("jump") and jumps_remaining > 0:
+	if _just_pressed("jump") and jumps_remaining > 0:
 		velocity.y = jump_velocity
 		jumps_remaining -= 1
 		# Re-enable floor snap after jumping
@@ -164,7 +290,7 @@ func _physics_process(delta: float) -> void:
 			velocity.x = 0
 
 	# Variable jump height
-	if Input.is_action_just_released("jump") and velocity.y < 0:
+	if _just_released("jump") and velocity.y < 0:
 		velocity.y *= 0.5
 
 	# Move
@@ -190,9 +316,19 @@ func _physics_process(delta: float) -> void:
 
 	_check_double_tap_dash()
 	_update_animation()
+	_update_aim_indicator()
+
+	# Handle gamepad weapon switching
+	if input_device == "gamepad" and weapon_manager:
+		if _just_pressed("weapon_next"):
+			weapon_manager._switch_weapon(1)
+		elif _just_pressed("weapon_prev"):
+			weapon_manager._switch_weapon(-1)
+
+	_clear_just_states()
 
 func _apply_gravity(delta: float) -> void:
-	if Input.is_action_pressed("move_down"):
+	if _pressed("move_down"):
 		velocity.y = move_toward(velocity.y, fast_fall_speed, gravity * 2 * delta)
 	else:
 		velocity.y += gravity * delta
@@ -205,7 +341,7 @@ func _check_double_tap_dash() -> void:
 	var current_time := Time.get_ticks_msec()
 	var window_ms := int(double_tap_window * 1000)
 
-	if Input.is_action_just_pressed("move_left"):
+	if _just_pressed("move_left"):
 		if last_direction == -1 and (current_time - last_left_time) < window_ms:
 			_trigger_dash(-1)
 			last_direction = 0
@@ -213,7 +349,7 @@ func _check_double_tap_dash() -> void:
 			last_left_time = current_time
 			last_direction = -1
 
-	if Input.is_action_just_pressed("move_right"):
+	if _just_pressed("move_right"):
 		if last_direction == 1 and (current_time - last_right_time) < window_ms:
 			_trigger_dash(1)
 			last_direction = 0
@@ -244,23 +380,26 @@ func _update_animation() -> void:
 	if is_attacking:
 		return
 	
-	# Determine facing direction based on aim/mouse
-	var mouse_pos = get_global_mouse_position()
-	var aim_direction = (mouse_pos - global_position).normalized()
-	
-	# Update facing direction based on aim
-	if abs(aim_direction.x) > abs(aim_direction.y):
-		# Horizontal facing
-		if aim_direction.x > 0:
+	# Determine facing direction based on movement when moving, aim when stopped
+	if abs(velocity.x) > 10:
+		# Moving: face movement direction
+		if velocity.x > 0:
 			facing_direction = "right"
 		else:
 			facing_direction = "left"
 	else:
-		# Vertical facing
-		if aim_direction.y > 0:
-			facing_direction = "down"
+		# Stopped: face aim direction
+		var aim = _get_aim_direction()
+		if abs(aim.x) > abs(aim.y):
+			if aim.x > 0:
+				facing_direction = "right"
+			else:
+				facing_direction = "left"
 		else:
-			facing_direction = "up"
+			if aim.y > 0:
+				facing_direction = "down"
+			else:
+				facing_direction = "up"
 	
 	# Determine animation state
 	var animation_name: String
@@ -350,16 +489,15 @@ func set_team(new_team: int) -> void:
 		TeamManager.set_team(self, team)
 
 func _handle_weapon_attack() -> void:
-	# Get aim direction from mouse
-	var mouse_pos = get_global_mouse_position()
-	var aim_direction = (mouse_pos - global_position).normalized()
+	# Get aim direction (device-aware)
+	var aim_direction = _get_aim_direction()
 
 	# Update last aim direction if aiming
 	if aim_direction.length() > 0.1:
 		last_aim_direction = aim_direction
 
 	# Check for shoot/attack input
-	if Input.is_action_pressed("shoot") and weapon_manager:
+	if _pressed("shoot") and weapon_manager:
 		# Play attack animation for melee weapons
 		var current_weapon = weapon_manager.get_current_weapon()
 		if current_weapon and current_weapon.is_melee and not is_attacking:
@@ -367,3 +505,28 @@ func _handle_weapon_attack() -> void:
 			visual.play("attack_" + facing_direction)
 		
 		weapon_manager.attack(last_aim_direction)
+
+# --- Aim indicator ---
+
+func _create_aim_indicator() -> void:
+	aim_indicator = Polygon2D.new()
+	aim_indicator.name = "AimIndicator"
+	aim_indicator.polygon = PackedVector2Array([
+		Vector2(8, 0),
+		Vector2(-4, -5),
+		Vector2(-4, 5)
+	])
+	aim_indicator.color = Color(1, 1, 1, 0.6)
+	aim_indicator.z_index = 1
+	add_child(aim_indicator)
+
+func _update_aim_indicator() -> void:
+	if not aim_indicator or is_dead:
+		if aim_indicator:
+			aim_indicator.visible = false
+		return
+	var aim = _get_aim_direction()
+	var indicator_distance = 40.0
+	aim_indicator.position = aim * indicator_distance
+	aim_indicator.rotation = aim.angle()
+	aim_indicator.visible = true

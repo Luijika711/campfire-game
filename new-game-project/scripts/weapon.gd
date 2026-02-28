@@ -17,6 +17,10 @@ signal weapon_cooldown_finished()
 @export var cooldown: float = 0.5
 @export var icon: Texture2D
 
+var is_melee: bool:
+	get:
+		return weapon_type == WeaponType.MELEE_SWORD
+
 var is_on_cooldown: bool = false
 var cooldown_timer: float = 0.0
 var can_attack: bool = true

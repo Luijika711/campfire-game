@@ -10,6 +10,7 @@ extends Weapon
 @onready var sword_visual: Polygon2D
 
 var held_icon: Polygon2D
+var is_swinging: bool = false
 
 func _ready() -> void:
 	super._ready()

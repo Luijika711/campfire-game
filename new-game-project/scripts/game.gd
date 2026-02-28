@@ -1,6 +1,7 @@
 extends Node2D
 
 const LEVELS_DIR := "res://scenes/levels/"
+const PLAYER_SCENE := preload("res://scenes/player.tscn")
 
 @export var current_map_id: String = "basic"
 
@@ -11,7 +12,6 @@ const LEVELS_DIR := "res://scenes/levels/"
 @onready var level_container: Node2D = $LevelContainer
 @onready var coins: Node2D = $Coins
 @onready var goal: Node2D = $Goal
-@onready var host_player: CharacterBody2D = $HostPlayer
 @onready var game_camera: Camera2D = $GameCamera
 @onready var health_bar: ProgressBar = $CanvasLayer/UI/HealthBar
 @onready var health_label: Label = $CanvasLayer/UI/HealthLabel
@@ -19,20 +19,15 @@ const LEVELS_DIR := "res://scenes/levels/"
 @onready var weapon_2_label: Label = $CanvasLayer/UI/Weapon2Label
 @onready var weapon_3_label: Label = $CanvasLayer/UI/Weapon3Label
 @onready var pause_menu: Control = $CanvasLayer/PauseMenu
-@onready var team_label: Label
+
+var players: Dictionary = {}  # player_id -> player node
+var spawn_points: Array[Vector2] = []
+var current_player_index: int = 0  # For UI updates
 
 func _ready() -> void:
-	# Setup camera
-	if game_camera:
-		game_camera.setup(host_player, $PlayerManager)
-
 	GameManager.coins_changed.connect(_on_coins_changed)
 	GameManager.reset_coins()
 	_update_coin_label(0)
-
-	# Connect to NetworkManager for player join/leave events
-	NetworkManager.player_connected.connect(_on_player_connected)
-	NetworkManager.player_disconnected.connect(_on_player_disconnected)
 
 	# Connect QR button
 	show_qr_button.pressed.connect(_on_show_qr_pressed)
@@ -46,33 +41,20 @@ func _ready() -> void:
 		level_to_load = GameManager.selected_level
 	_load_map(level_to_load)
 
-	# Connect to host player health and weapon signals
-	if host_player:
-		# Assign host to Team Red by default
-		host_player.set_team(TeamManager.Team.TEAM_RED)
+	# Spawn all players from PartyManager
+	_spawn_all_players()
 
-		host_player.health_changed.connect(_on_player_health_changed)
-		host_player.weapon_changed.connect(_on_weapon_changed)
+	# Setup camera to follow first player
+	if players.size() > 0:
+		var first_player = players.values()[0]
+		if game_camera and game_camera.has_method("setup"):
+			game_camera.setup(first_player, self)
 
-		# Connect to weapon manager for ammo updates
-		if host_player.weapon_manager:
-			host_player.weapon_manager.weapon_ammo_changed.connect(_on_weapon_ammo_changed)
-
-		# Initialize health display
-		if host_player.health_component:
-			var health = host_player.health_component
-			_on_player_health_changed(health.current_health, health.max_health)
-
-	# Update weapon UI
+	# Update UI
+	_update_player_count()
 	_update_weapon_ui()
 
-	# Create team label dynamically
-	_create_team_label()
-
-	# Initial player count (just host)
-	_update_player_count()
-
-	print("Game started! Press 'Show QR Code' to let players join.")
+	print("Game started with %d players!" % players.size())
 
 func _load_map(map_id: String) -> void:
 	# Clear any previous level
@@ -94,12 +76,16 @@ func _load_map(map_id: String) -> void:
 	level_container.add_child(level)
 
 	# Read spawn points from Marker2D nodes
-	var spawn_points: Array[Vector2] = []
+	spawn_points.clear()
 	var spawn_container = level.get_node_or_null("SpawnPoints")
 	if spawn_container:
 		for marker in spawn_container.get_children():
 			if marker is Marker2D:
 				spawn_points.append(marker.position)
+
+	# Fallback spawn points if none defined
+	if spawn_points.size() == 0:
+		spawn_points = [Vector2(100, 400), Vector2(200, 400), Vector2(300, 400), Vector2(400, 400)]
 
 	# Read coin positions from Marker2D nodes
 	var coin_positions: Array[Vector2] = []
@@ -115,10 +101,6 @@ func _load_map(map_id: String) -> void:
 	if goal_marker is Marker2D:
 		goal_pos = goal_marker.position
 
-	# Position host player at first spawn point
-	if host_player != null and spawn_points.size() > 0:
-		host_player.position = spawn_points[0]
-
 	# Spawn coins
 	_spawn_coins(coin_positions)
 
@@ -126,11 +108,63 @@ func _load_map(map_id: String) -> void:
 	if goal != null:
 		goal.position = goal_pos
 
-	# Setup player manager spawn points
-	if $PlayerManager and spawn_points.size() > 0:
-		$PlayerManager.spawn_points = spawn_points
-
 	print("Level loaded: %s" % map_id)
+
+func _spawn_all_players() -> void:
+	# Get all players from PartyManager
+	var party_players = PartyManager.get_all_players()
+
+	if party_players.size() == 0:
+		# Fallback: spawn one keyboard player if none joined
+		push_warning("No players in party! Spawning default keyboard player.")
+		PartyManager.join_player("keyboard", -1)
+		party_players = PartyManager.get_all_players()
+
+	for i in range(party_players.size()):
+		var player_data = party_players[i]
+		_spawn_player(player_data, i)
+
+func _spawn_player(player_data: PartyManager.PlayerData, spawn_index: int) -> void:
+	var player = PLAYER_SCENE.instantiate()
+
+	# Set position
+	if spawn_index < spawn_points.size():
+		player.position = spawn_points[spawn_index]
+	else:
+		player.position = spawn_points[spawn_index % spawn_points.size()]
+
+	# Configure player based on party data
+	player.name = "Player_" + str(player_data.player_id)
+
+	# Apply player color to visual
+	if player.has_node("AnimatedSprite2D"):
+		var visual = player.get_node("AnimatedSprite2D")
+		visual.modulate = player_data.player_color
+
+	# Set up input device (for local multiplayer)
+	# This would need to be handled in the player script based on device
+	# For now, we just track it
+	player.set_meta("input_device", player_data.input_device)
+	player.set_meta("device_id", player_data.device_id)
+	player.set_meta("player_id", player_data.player_id)
+	player.set_meta("player_color", player_data.player_color)
+
+	# Add to scene
+	add_child(player)
+	players[player_data.player_id] = player
+
+	# Connect signals for host player (first player) UI
+	if players.size() == 1:
+		player.health_changed.connect(_on_player_health_changed)
+		player.weapon_changed.connect(_on_weapon_changed)
+		if player.weapon_manager:
+			player.weapon_manager.weapon_ammo_changed.connect(_on_weapon_ammo_changed)
+		if player.health_component:
+			var cur_health = player.health_component.current_health
+			var max_health = player.health_component.max_health
+			_on_player_health_changed(cur_health, max_health)
+
+	print("Spawned %s at position %s" % [player_data.player_name, player.position])
 
 func _spawn_coins(positions: Array[Vector2]) -> void:
 	# Clear existing coins
@@ -150,20 +184,9 @@ func _on_coins_changed(new_count: int) -> void:
 func _update_coin_label(count: int) -> void:
 	coin_label.text = "Coins: %d" % count
 
-func _on_player_connected(
-	_player_id: int, player_name: String,
-	_color: String, _team: int = 0
-) -> void:
-	_update_player_count()
-	print("Player joined: %s" % player_name)
-
-func _on_player_disconnected(_player_id: int) -> void:
-	_update_player_count()
-
 func _update_player_count() -> void:
-	if $PlayerManager:
-		var count = $PlayerManager.get_player_count() + 1  # +1 for host
-		player_count_label.text = "Players: %d/8" % count
+	var count = players.size()
+	player_count_label.text = "Players: %d/8" % count
 
 func _on_show_qr_pressed() -> void:
 	qr_display.visible = !qr_display.visible
@@ -192,6 +215,11 @@ func _on_weapon_ammo_changed(weapon_index: int, ammo_text: String) -> void:
 				weapon_3_label.text = "[3] Laser: " + ammo_text
 
 func _update_weapon_ui() -> void:
+	# Get the first player for UI
+	if players.size() == 0:
+		return
+
+	var host_player = players.values()[0]
 	if not host_player or not host_player.weapon_manager:
 		return
 
@@ -214,31 +242,10 @@ func _update_weapon_ui() -> void:
 				Weapon.WeaponType.LASER_GUN:
 					label.text = prefix + "[%d] Laser: %s" % [i + 1, weapon.get_ammo_text()]
 
-func _create_team_label() -> void:
-	team_label = Label.new()
-	team_label.name = "TeamLabel"
-	team_label.anchors_preset = 1  # Top-right
-	team_label.anchor_left = 1.0
-	team_label.anchor_right = 1.0
-	team_label.offset_left = -200.0
-	team_label.offset_top = 135.0
-	team_label.offset_right = -20.0
-	team_label.offset_bottom = 160.0
-	team_label.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	team_label.add_theme_font_size_override("font_size", 18)
-	team_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+func get_player(player_id: int) -> Node:
+	if players.has(player_id):
+		return players[player_id]
+	return null
 
-	var ui = $CanvasLayer/UI
-	if ui:
-		ui.add_child(team_label)
-
-	_update_team_label()
-
-func _update_team_label() -> void:
-	if not team_label or not host_player or not TeamManager:
-		return
-	var team = TeamManager.get_team(host_player)
-	var team_name = TeamManager.get_team_name(team)
-	var team_color = TeamManager.get_team_color(team)
-	team_label.text = "Team: %s" % team_name
-	team_label.add_theme_color_override("font_color", team_color)
+func get_all_players() -> Dictionary:
+	return players.duplicate()

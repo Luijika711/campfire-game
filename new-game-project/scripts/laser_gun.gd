@@ -121,10 +121,9 @@ func _fire_laser(direction: Vector2) -> void:
 			_show_hit_at(hit_pos)
 			hits += 1
 		elif collider.is_in_group("players"):
-			if TeamManager and TeamManager.are_enemies(player, collider):
-				if collider.has_method("take_damage"):
-					collider.take_damage(damage, player)
-				_show_hit_at(hit_pos)
+			if collider.has_method("take_damage"):
+				collider.take_damage(damage, player)
+			_show_hit_at(hit_pos)
 			hits += 1
 		else:
 			# Unknown collider, stop beam

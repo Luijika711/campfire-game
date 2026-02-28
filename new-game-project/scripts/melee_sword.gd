@@ -101,13 +101,9 @@ func _on_hitbox_body_entered(body: Node2D) -> void:
 	if body == player:
 		return
 
-	# Team-aware player damage
+	# FFA: damage any player that isn't the wielder
 	if body.is_in_group("players"):
-		if TeamManager and player:
-			if not TeamManager.are_enemies(player, body):
-				return  # Skip allies
-		else:
-			return  # No team info: skip players
+		pass  # Allow damage below
 
 	# Apply damage
 	if body.has_node("HealthComponent"):

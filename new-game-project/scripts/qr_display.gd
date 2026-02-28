@@ -77,15 +77,20 @@ func _get_local_ip() -> String:
 
 func _fetch_qr_code(data: String) -> void:
 	var encoded_data = data.uri_encode()
-	var api_url = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=%s" % encoded_data
+	var base = "https://api.qrserver.com/v1/create-qr-code/"
+	var api_url = "%s?size=300x300&format=png&data=%s" % [base, encoded_data]
 
-	http_request.request_completed.connect(_on_qr_request_completed, CONNECT_ONE_SHOT)
+	http_request.request_completed.connect(
+		_on_qr_request_completed, CONNECT_ONE_SHOT)
 	var error = http_request.request(api_url)
 	if error != OK:
 		push_warning("QR API request failed, generating fallback")
 		_generate_fallback_qr(data)
 
-func _on_qr_request_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+func _on_qr_request_completed(
+	result: int, response_code: int,
+	_headers: PackedStringArray, body: PackedByteArray
+) -> void:
 	if result == HTTPRequest.RESULT_SUCCESS and response_code == 200 and body.size() > 0:
 		var image = Image.new()
 		var err = image.load_png_from_buffer(body)

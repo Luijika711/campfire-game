@@ -6,7 +6,6 @@ extends Area2D
 var direction: Vector2 = Vector2.RIGHT
 var damage: int = 1
 var shooter: Node = null
-var shooter_team: int = 0  # TeamManager.Team.NONE
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -30,8 +29,6 @@ func setup(
 	position = start_pos
 	damage = bullet_damage
 	shooter = bullet_shooter
-	if shooter and TeamManager:
-		shooter_team = TeamManager.get_team(shooter)
 
 	# Rotate sprite to face direction
 	rotation = direction.angle()
@@ -41,14 +38,11 @@ func _on_body_entered(body: Node2D) -> void:
 	if body == shooter:
 		return
 
-	# Team-aware player damage
+	# Hit players (FFA - damage anyone except shooter)
 	if body.is_in_group("players"):
-		if TeamManager and shooter:
-			if TeamManager.are_enemies(shooter, body):
-				if body.has_method("take_damage"):
-					body.take_damage(damage, self)
-				_destroy_with_effect()
-			# Allies: bullet passes through (no destroy)
+		if body.has_method("take_damage"):
+			body.take_damage(damage, self)
+		_destroy_with_effect()
 		return
 
 	# Deal damage to enemies

@@ -12,7 +12,6 @@ extends CharacterBody2D
 @export var double_tap_window: float = 0.35
 
 @export var max_health: int = 100
-@export var team: int = 0  # TeamManager.Team.NONE
 @export var character_scale: float = 1.0
 
 @onready var visual: AnimatedSprite2D = $AnimatedSprite2D
@@ -68,10 +67,6 @@ func _ready() -> void:
 	# Apply character scale
 	if character_scale != 1.0:
 		scale = Vector2(character_scale, character_scale)
-
-	# Register team
-	if TeamManager:
-		TeamManager.set_team(self, team)
 
 	# Initialize health
 	if health_component:
@@ -380,10 +375,10 @@ func _trigger_dash(direction: int) -> void:
 func _update_animation() -> void:
 	if is_dead:
 		return
-	
+
 	if is_attacking:
 		return
-	
+
 	# Determine facing direction based on movement when moving, aim when stopped
 	if abs(velocity.x) > 10:
 		# Moving: face movement direction
@@ -404,10 +399,10 @@ func _update_animation() -> void:
 				facing_direction = "down"
 			else:
 				facing_direction = "up"
-	
+
 	# Determine animation state
 	var animation_name: String
-	
+
 	if is_dashing:
 		animation_name = "dash_" + facing_direction
 	elif not is_on_floor():
@@ -420,7 +415,7 @@ func _update_animation() -> void:
 			animation_name = "walk_" + facing_direction
 	else:
 		animation_name = "idle_" + facing_direction
-	
+
 	# Play animation if different
 	if visual.animation != animation_name:
 		visual.play(animation_name)
@@ -507,7 +502,7 @@ func _handle_weapon_attack() -> void:
 		if current_weapon and current_weapon.is_melee and not is_attacking:
 			is_attacking = true
 			visual.play("attack_" + facing_direction)
-		
+
 		weapon_manager.attack(last_aim_direction)
 
 # --- Aim indicator ---

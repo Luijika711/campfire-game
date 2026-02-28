@@ -44,6 +44,9 @@ func _ready() -> void:
 	# Spawn all players from PartyManager
 	_spawn_all_players()
 
+	# Create death pit at the bottom of the level
+	_create_death_pit()
+
 	# Setup camera to follow first player
 	if players.size() > 0:
 		var first_player = players.values()[0]
@@ -110,6 +113,29 @@ func _load_map(map_id: String) -> void:
 
 	print("Level loaded: %s" % map_id)
 
+func _create_death_pit() -> void:
+	var death_pit = Area2D.new()
+	death_pit.name = "DeathPit"
+	death_pit.collision_layer = 0
+	death_pit.collision_mask = 1  # Detect players
+	death_pit.add_to_group("hazards")
+
+	var shape = CollisionShape2D.new()
+	var rect = RectangleShape2D.new()
+	rect.size = Vector2(20000, 100)
+	shape.shape = rect
+
+	# Place far below the level (y=1200 is well below 1080p viewport)
+	death_pit.position = Vector2(0, 1200)
+	death_pit.add_child(shape)
+	add_child(death_pit)
+
+	death_pit.body_entered.connect(_on_death_pit_entered)
+
+func _on_death_pit_entered(body: Node2D) -> void:
+	if body.is_in_group("players") and body.has_method("take_damage"):
+		body.take_damage(9999)
+
 func _spawn_all_players() -> void:
 	# Get all players from PartyManager
 	var party_players = PartyManager.get_all_players()
@@ -148,9 +174,6 @@ func _spawn_player(player_data: PartyManager.PlayerData, spawn_index: int) -> vo
 	player.set_meta("device_id", player_data.device_id)
 	player.set_meta("player_id", player_data.player_id)
 	player.set_meta("player_color", player_data.player_color)
-
-	# Set team
-	player.team = player_data.team
 
 	# Add to scene
 	add_child(player)

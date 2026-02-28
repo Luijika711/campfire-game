@@ -53,8 +53,6 @@ func _on_player_disconnected(player_id: int):
 	if players.has(player_id):
 		var player = players[player_id]
 		used_colors.erase(player.player_color)
-		if TeamManager:
-			TeamManager.remove_player(player)
 		player.queue_free()
 		players.erase(player_id)
 		print("Removed player %d" % player_id)

@@ -116,9 +116,7 @@ func _handle_join(peer_id: int, data: Dictionary):
 	})
 
 	player_connected.emit(player_id, player_name, color, team)
-	var tname = TeamManager.get_team_name(team) if TeamManager else str(team)
-	print("Player %d joined: %s (%s) - %s" % [
-		player_id, player_name, color, tname])
+	print("Player %d joined: %s (%s)" % [player_id, player_name, color])
 
 func _handle_input(peer_id: int, data: Dictionary):
 	if not players.has(peer_id):

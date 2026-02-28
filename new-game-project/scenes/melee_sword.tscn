@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://melee_sword"]
+
+[ext_resource type="Script" path="res://scripts/melee_sword.gd" id="1_melee_sword"]
+
+[node name="MeleeSword" type="Node2D"]
+script = ExtResource("1_melee_sword")
+weapon_name = "Melee Sword"
+damage = 25
+cooldown = 0.4
+swing_range = 60.0
+swing_angle = 120.0
+swing_duration = 0.15
+knockback_force = 300.0

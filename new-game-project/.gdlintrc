@@ -1,0 +1,35 @@
+# GDToolkit linter configuration
+# https://github.com/Scony/godot-gdscript-toolkit
+
+disable:
+  - class-definitions-order
+
+# Maximum line length
+max-line-length: 100
+
+# Maximum number of public methods in a class
+max-public-methods: 20
+
+# Maximum number of function arguments
+max-function-arguments: 6
+
+# Maximum number of function returns
+max-returns: 6
+
+# Maximum cyclomatic complexity
+max-comp-level: 10
+
+# Naming conventions
+class-load-variable-name: _?_?[a-z][a-z0-9]*(_[a-z0-9]+)*
+class-name: ([A-Z][a-z0-9]*)+
+class-variable-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+constant-name: _?[A-Z][A-Z0-9]*(_[A-Z0-9]+)*
+enum-element-name: _?[A-Z][A-Z0-9]*(_[A-Z0-9]+)*
+enum-name: ([A-Z][a-z0-9]*)+
+function-argument-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+function-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+function-variable-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+load-constant-name: _?[A-Z][A-Z0-9]*(_[A-Z0-9]+)*
+loop-variable-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+signal-name: _?[a-z][a-z0-9]*(_[a-z0-9]+)*
+sub-class-name: _?([A-Z][a-z0-9]*)+

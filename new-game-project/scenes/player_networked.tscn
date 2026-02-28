@@ -1,0 +1,74 @@
+[gd_scene load_steps=10 format=3 uid="uid://player_networked"]
+
+[ext_resource type="Script" path="res://scripts/player_networked.gd" id="1_networked"]
+[ext_resource type="PackedScene" uid="uid://cqm7hyhksx2no" path="res://scenes/crosshair.tscn" id="2_crosshair"]
+[ext_resource type="Script" path="res://scripts/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://scripts/weapon_manager.gd" id="4_weapon_manager"]
+[ext_resource type="PackedScene" path="res://scenes/melee_sword.tscn" id="5_melee_sword"]
+[ext_resource type="PackedScene" path="res://scenes/gun.tscn" id="6_gun"]
+[ext_resource type="PackedScene" path="res://scenes/laser_gun.tscn" id="7_laser_gun"]
+
+[sub_resource type="Gradient" id="Gradient_player"]
+colors = PackedColorArray(1, 0.2, 0.2, 1, 0.8, 0.1, 0.1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_player"]
+gradient = SubResource("Gradient_player")
+width = 32
+height = 48
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(28, 44)
+
+[node name="PlayerNetworked" type="CharacterBody2D" groups=["player"]]
+collision_layer = 1
+collision_mask = 6
+script = ExtResource("1_networked")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 10
+texture = SubResource("GradientTexture2D_player")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="Nametag" type="Label" parent="."]
+z_index = 20
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -65.0
+offset_right = 50.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 12
+text = "Player"
+horizontal_alignment = 1
+
+[node name="HazardDetector" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardDetector"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="Crosshair" parent="." instance=ExtResource("2_crosshair")]
+z_index = 15
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+max_health = 100
+current_health = 100
+
+[node name="WeaponManager" type="Node2D" parent="."]
+script = ExtResource("4_weapon_manager")
+weapon_slots = [ExtResource("5_melee_sword"), ExtResource("6_gun"), ExtResource("7_laser_gun")]
+
+[connection signal="body_entered" from="HazardDetector" to="." method="die"]

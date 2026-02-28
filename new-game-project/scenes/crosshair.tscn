@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cqm7hyhksx2no"]
+
+[ext_resource type="Script" path="res://scripts/crosshair.gd" id="1_abc12"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_abcd"]
+radius = 4.0
+
+[sub_resource type="Gradient" id="Gradient_crosshair"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="Crosshair" type="Node2D"]
+script = ExtResource("1_abc12")
+
+[node name="CenterDot" type="Polygon2D" parent="."]
+color = Color(1, 0, 0, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)
+
+[node name="OuterRing" type="Line2D" parent="."]
+points = PackedVector2Array(0, -10, 0, -6, 0, -10, 6, -8, 0, -10, 10, 0, 0, -10, 6, 8, 0, -10, 0, 10, 0, -10, -6, 8, 0, -10, -10, 0, 0, -10, -6, -8)
+default_color = Color(1, 0, 0, 0.8)

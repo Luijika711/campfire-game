@@ -1,0 +1,98 @@
+[gd_scene load_steps=9 format=3 uid="uid://enemy_base"]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/health_component.gd" id="2_health"]
+[ext_resource type="PackedScene" uid="uid://health_bar" path="res://scenes/health_bar.tscn" id="3_health_bar"]
+[ext_resource type="Script" path="res://scripts/weapon_manager.gd" id="4_weapon_manager"]
+[ext_resource type="PackedScene" path="res://scenes/gun.tscn" id="5_gun"]
+
+[sub_resource type="Gradient" id="Gradient_enemy"]
+colors = PackedColorArray(0.8, 0.2, 0.2, 1, 0.6, 0.1, 0.1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_enemy"]
+gradient = SubResource("Gradient_enemy")
+width = 32
+height = 48
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
+size = Vector2(28, 44)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(28, 44)
+
+[node name="Enemy" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 7
+script = ExtResource("1_enemy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 10
+texture = SubResource("GradientTexture2D_enemy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_enemy")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 50
+current_health = 50
+
+[node name="HealthBar" parent="." instance=ExtResource("3_health_bar")]
+z_index = 20
+position = Vector2(-30, -40)
+
+[node name="WeaponManager" type="Node2D" parent="."]
+script = ExtResource("4_weapon_manager")
+weapon_slots = [ExtResource("5_gun")]
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="AttackTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="FloorCheckLeft" type="RayCast2D" parent="."]
+position = Vector2(-14, 22)
+target_position = Vector2(0, 20)
+collision_mask = 2
+
+[node name="FloorCheckRight" type="RayCast2D" parent="."]
+position = Vector2(14, 22)
+target_position = Vector2(0, 20)
+collision_mask = 2
+
+[node name="WallCheckLeft" type="RayCast2D" parent="."]
+position = Vector2(-16, 0)
+target_position = Vector2(-10, 0)
+collision_mask = 2
+
+[node name="WallCheckRight" type="RayCast2D" parent="."]
+position = Vector2(16, 0)
+target_position = Vector2(10, 0)
+collision_mask = 2
+
+[node name="PlatformCheck" type="RayCast2D" parent="."]
+position = Vector2(0, -20)
+target_position = Vector2(60, -80)
+collision_mask = 2
+
+[node name="WalkDust" type="GPUParticles2D" parent="."]
+position = Vector2(0, 22)
+emitting = false
+amount = 20
+lifetime = 0.4
+fixed_fps = 60
+
+[node name="JumpDust" type="GPUParticles2D" parent="."]
+position = Vector2(0, 22)
+emitting = false
+amount = 15
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.3
+
+[connection signal="body_entered" from="Hitbox" to="." method="take_damage" binds= [10]]

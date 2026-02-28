@@ -1,0 +1,171 @@
+[gd_scene format=3 uid="uid://main123"]
+
+[ext_resource type="Script" uid="uid://bqxre1pl82yx" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Texture2D" uid="uid://t1yxljrhlv0q" path="res://assets/wallpaper-sky-lvl1.jpeg" id="2_o6xl0"]
+[ext_resource type="PackedScene" uid="uid://player123" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://goal123" path="res://scenes/goal.tscn" id="4_goal"]
+[ext_resource type="PackedScene" path="res://scenes/player_networked.tscn" id="5_player_networked"]
+[ext_resource type="Script" uid="uid://b8eydbaqtv2xa" path="res://scripts/player_manager.gd" id="6_player_manager"]
+[ext_resource type="PackedScene" path="res://scenes/qr_display.tscn" id="7_qr_display"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grounds"]
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSet" id="TileSet_main"]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 2
+physics_layer_0/collision_mask = 0
+sources/0 = SubResource("TileSetAtlasSource_grounds")
+
+[node name="Main" type="Node2D" unique_id=2080572181]
+script = ExtResource("1_main")
+
+[node name="Background" type="Sprite2D" parent="." unique_id=1531458808]
+modulate = Color(0.5, 0.7, 1, 1)
+z_index = -1
+position = Vector2(576, 324)
+scale = Vector2(1152, 648)
+texture = ExtResource("2_o6xl0")
+
+[node name="TileMap" type="TileMap" parent="." unique_id=1504328302]
+tile_set = SubResource("TileSet_main")
+format = 2
+layer_0/name = "Ground"
+
+[node name="HostPlayer" parent="." unique_id=490597085 instance=ExtResource("2_player")]
+position = Vector2(100, 400)
+
+[node name="PlayerManager" type="Node2D" parent="." unique_id=1148235337]
+script = ExtResource("6_player_manager")
+player_scene = ExtResource("5_player_networked")
+
+[node name="Coins" type="Node2D" parent="." unique_id=2093062999]
+
+[node name="Goal" parent="." unique_id=907730473 instance=ExtResource("4_goal")]
+position = Vector2(1050, 186)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=343623237]
+
+[node name="UI" type="Control" parent="CanvasLayer" unique_id=1918295918]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CoinLabel" type="Label" parent="CanvasLayer/UI" unique_id=1701924721]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 50.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "Coins: 0"
+horizontal_alignment = 2
+
+[node name="PlayerCountLabel" type="Label" parent="CanvasLayer/UI" unique_id=1464769556]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 50.0
+offset_right = -20.0
+offset_bottom = 80.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "Players: 1/8"
+horizontal_alignment = 2
+
+[node name="Instructions" type="Label" parent="CanvasLayer/UI" unique_id=1464769555]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -50.0
+offset_right = 400.0
+offset_bottom = -20.0
+grow_vertical = 0
+text = "WASD/Arrows: Move | Space: Jump | S/Down: Fast Fall | Double-tap A/D: Dash | Mouse: Aim/Shoot | 1/2/3: Switch Weapons | ESC: Quit"
+
+[node name="HealthBar" type="ProgressBar" parent="CanvasLayer/UI" unique_id=1464769560]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 80.0
+offset_right = -20.0
+offset_bottom = 100.0
+grow_horizontal = 0
+value = 100.0
+
+[node name="HealthLabel" type="Label" parent="CanvasLayer/UI" unique_id=1464769561]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 105.0
+offset_right = -20.0
+offset_bottom = 130.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 16
+text = "Health: 100/100"
+horizontal_alignment = 2
+
+[node name="Weapon1Label" type="Label" parent="CanvasLayer/UI" unique_id=1464769562]
+layout_mode = 1
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 200.0
+offset_bottom = 85.0
+theme_override_font_sizes/font_size = 18
+text = "[1] Sword"
+
+[node name="Weapon2Label" type="Label" parent="CanvasLayer/UI" unique_id=1464769563]
+layout_mode = 1
+offset_left = 20.0
+offset_top = 85.0
+offset_right = 200.0
+offset_bottom = 110.0
+theme_override_font_sizes/font_size = 18
+text = "[2] Gun: 30/30"
+
+[node name="Weapon3Label" type="Label" parent="CanvasLayer/UI" unique_id=1464769564]
+layout_mode = 1
+offset_left = 20.0
+offset_top = 110.0
+offset_right = 200.0
+offset_bottom = 135.0
+theme_override_font_sizes/font_size = 18
+text = "[3] Laser: 20/20"
+
+[node name="ShowQRButton" type="Button" parent="CanvasLayer/UI" unique_id=1464769557]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -120.0
+offset_top = -80.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Show QR Code"
+
+[node name="QRDisplay" parent="CanvasLayer" unique_id=343623238 instance=ExtResource("7_qr_display")]
+visible = false

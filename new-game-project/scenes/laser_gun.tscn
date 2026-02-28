@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://laser_gun"]
+
+[ext_resource type="Script" path="res://scripts/laser_gun.gd" id="1_laser_gun"]
+
+[node name="LaserGun" type="Node2D"]
+script = ExtResource("1_laser_gun")
+weapon_name = "Laser Gun"
+damage = 50
+cooldown = 1.0
+laser_range = 500.0
+laser_width = 4.0
+charge_time = 0.3
+beam_duration = 0.5
+max_ammo = 20
+ammo_per_shot = 5
+penetration_count = 3

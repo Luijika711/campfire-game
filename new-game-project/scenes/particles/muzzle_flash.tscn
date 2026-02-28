@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://muzzle_flash"]
+
+[sub_resource type="Gradient" id="Gradient_flash"]
+colors = PackedColorArray(1, 0.9, 0.3, 1, 1, 0.5, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_flash"]
+gradient = SubResource("Gradient_flash")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_flash"]
+particle_flag_disable_z = true
+spread = 30.0
+initial_velocity_min = 100.0
+initial_velocity_max = 200.0
+gravity = Vector3(0, 0, 0)
+scale_min = 2.0
+scale_max = 5.0
+color_ramp = SubResource("GradientTexture1D_flash")
+
+[node name="MuzzleFlash" type="GPUParticles2D"]
+emitting = false
+amount = 12
+process_material = SubResource("ParticleProcessMaterial_flash")
+lifetime = 0.1
+one_shot = true
+explosiveness = 1.0
+local_coords = true

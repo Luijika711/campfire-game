@@ -60,5 +60,5 @@ func _on_area_entered(_area: Area2D) -> void:
 	pass
 
 func _destroy_with_effect() -> void:
-	# Could add particle effect here
+	AudioManager.play_named_sfx("bullet_impact", 0.15)
 	queue_free()

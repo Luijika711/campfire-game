@@ -358,6 +358,7 @@ func _on_health_changed(current: int, max_health: int) -> void:
 
 func _on_health_depleted() -> void:
 	is_dead = true
+	AudioManager.play_named_sfx("enemy_death")
 
 	# Death animation
 	visual.modulate = Color(0.3, 0.3, 0.3, 0.5)
@@ -375,3 +376,4 @@ func take_damage(amount: int, source: Node = null) -> void:
 		return
 
 	health_component.take_damage(amount, source)
+	AudioManager.play_named_sfx("enemy_hit")

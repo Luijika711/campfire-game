@@ -242,6 +242,7 @@ func _physics_process(delta: float) -> void:
 	if _just_pressed("jump") and jumps_remaining > 0:
 		velocity.y = jump_velocity
 		jumps_remaining -= 1
+		AudioManager.play_named_sfx("jump", 0.1)
 		# Re-enable floor snap after jumping
 		floor_snap_length = 8.0
 		target_rotation = 0.0  # Reset rotation when jumping
@@ -382,6 +383,7 @@ func _trigger_dash(direction: int) -> void:
 	velocity.x = direction * dash_speed
 	velocity.y = 0
 	visual.modulate = Color(1, 1, 0, 1)
+	AudioManager.play_named_sfx("dash")
 	# Emit dash trail
 	if dash_trail:
 		dash_trail.restart()
@@ -449,6 +451,7 @@ func take_damage(amount: int, source: Node = null) -> void:
 
 	last_damage_source = source
 	health_component.take_damage(amount, source)
+	AudioManager.play_named_sfx("player_hit")
 
 	# Visual feedback
 	visual.modulate = Color(1, 0, 0, 1)
@@ -461,6 +464,7 @@ func die() -> void:
 		return
 
 	is_dead = true
+	AudioManager.play_named_sfx("player_death")
 
 	# Determine killer from last damage source
 	var killer: Node = null
@@ -490,6 +494,7 @@ func die() -> void:
 	visual.modulate = Color(0.3, 0.3, 0.3, 0.5)
 
 func collect_coin() -> void:
+	AudioManager.play_named_sfx("coin_pickup")
 	GameManager.add_coin()
 
 func _on_hazard_detector_body_entered(body: Node2D) -> void:

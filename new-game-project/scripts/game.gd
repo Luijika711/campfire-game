@@ -50,6 +50,11 @@ func _ready() -> void:
 	# Create death pit at the bottom of the level
 	_create_death_pit()
 
+	# Start background music
+	var bgm = load("res://assets/music/music-1.mp3")
+	if bgm:
+		AudioManager.play_music(bgm, 2.0)
+
 	# Setup camera to follow first player
 	if players.size() > 0:
 		var first_player = players.values()[0]

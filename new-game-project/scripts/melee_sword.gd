@@ -73,6 +73,7 @@ func perform_attack(direction: Vector2) -> void:
 
 	is_swinging = true
 	sword_visible = true
+	AudioManager.play_named_sfx("sword_swing", 0.1)
 
 	# Rotate sword to face direction
 	rotation = direction.angle()

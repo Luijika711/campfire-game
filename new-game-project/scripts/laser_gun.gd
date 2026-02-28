@@ -71,6 +71,7 @@ func perform_attack(direction: Vector2) -> void:
 func _fire_laser(direction: Vector2) -> void:
 	is_firing = true
 	current_ammo -= ammo_per_shot
+	AudioManager.play_named_sfx("laser_shoot")
 
 	var start_pos = global_position
 	var end_pos = start_pos + direction * laser_range

@@ -51,6 +51,7 @@ func _equip_weapon(index: int) -> void:
 
 	# Show new weapon
 	current_weapons[current_weapon_index].visible = true
+	AudioManager.play_named_sfx("weapon_switch")
 
 	weapon_changed.emit(current_weapons[current_weapon_index])
 

@@ -65,6 +65,9 @@ func perform_attack(direction: Vector2) -> void:
 
 		get_tree().current_scene.add_child(bullet)
 
+	# Play gun SFX
+	AudioManager.play_named_sfx("gun_shoot", 0.1)
+
 	# Show muzzle flash
 	_show_muzzle_flash(direction)
 

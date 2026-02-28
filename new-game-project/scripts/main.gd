@@ -21,6 +21,21 @@ extends Node2D
 @onready var weapon_3_label: Label = $CanvasLayer/UI/Weapon3Label
 
 func _ready() -> void:
+	# DEBUG: Check background setup
+	print("=== BACKGROUND DEBUG ===")
+	if background != null:
+		print("Background node found")
+		print("  - Position: " + str(background.position))
+		print("  - Scale: " + str(background.scale))
+		print("  - Modulate: " + str(background.modulate))
+		print("  - Texture: " + str(background.texture))
+		print("  - Visible: " + str(background.visible))
+		if background.texture != null:
+			print("  - Texture size: " + str(background.texture.get_size()))
+	else:
+		print("ERROR: Background node not found!")
+	print("=== END BACKGROUND DEBUG ===")
+	
 	GameManager.coins_changed.connect(_on_coins_changed)
 	_update_coin_label(0)
 
@@ -60,13 +75,23 @@ func _ready() -> void:
 	print("Game started! Press 'Show QR Code' to let players join.")
 
 func _load_map(map_id: String) -> void:
+	print("Loading map: " + map_id)
 	# Load map using MapManager
 	if MapManager.load_map(map_id, tile_map):
 		var map_data = MapManager.get_current_map()
 
-		# Update background color
+		# Background wallpaper displays at full color (no tint)
+		# DEBUG: Check background after map load
+		print("=== POST-LOAD BACKGROUND DEBUG ===")
 		if background != null:
-			background.modulate = map_data.background_color
+			print("Background after load:")
+			print("  - Position: " + str(background.position))
+			print("  - Scale: " + str(background.scale))
+			print("  - Modulate: " + str(background.modulate))
+			print("  - Texture: " + str(background.texture))
+		else:
+			print("ERROR: Background node not found after load!")
+		print("=== END POST-LOAD DEBUG ===")
 
 		# Position host player at first spawn point
 		if host_player != null:

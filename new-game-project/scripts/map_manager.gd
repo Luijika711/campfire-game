@@ -31,22 +31,24 @@ func load_map(map_id: String, target_tile_map: TileMap) -> bool:
 	current_map = available_maps[map_id]
 	tile_map = target_tile_map
 
-	# Clear existing tiles
-	tile_map.clear()
-
 	# Set tileset if provided
 	if current_map.tile_set != null:
 		tile_map.tile_set = current_map.tile_set
-
-	# Place tiles
-	print("Placing %d tiles..." % current_map.tiles.size())
-	for tile_data in current_map.tiles:
-		var x = tile_data.get("x", 0)
-		var y = tile_data.get("y", 0)
-		var layer = tile_data.get("layer", 0)
-		var atlas_coords = tile_data.get("atlas_coords", Vector2i(0, 0))
-
-		tile_map.set_cell(layer, Vector2i(x, y), 0, atlas_coords)
+	
+	# Check if tiles already exist (placed in editor) - preserve them
+	var existing_tiles = tile_map.get_used_cells(0)
+	if existing_tiles.size() > 0:
+		print("Editor tiles detected (%d tiles), preserving them and adding map tiles on top..." % existing_tiles.size())
+	else:
+		# No editor tiles, clear and use programmatic tiles
+		tile_map.clear()
+		print("Placing %d programmatic tiles..." % current_map.tiles.size())
+		for tile_data in current_map.tiles:
+			var x = tile_data.get("x", 0)
+			var y = tile_data.get("y", 0)
+			var layer = tile_data.get("layer", 0)
+			var atlas_coords = tile_data.get("atlas_coords", Vector2i(0, 0))
+			tile_map.set_cell(layer, Vector2i(x, y), 0, atlas_coords)
 
 	# Force tilemap update and rebuild collision
 	tile_map.force_update(0)

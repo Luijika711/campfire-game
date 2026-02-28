@@ -19,6 +19,25 @@ extends Node2D
 @onready var pause_menu: Control = $CanvasLayer/PauseMenu
 
 func _ready() -> void:
+	# DEBUG: Check background setup
+	print("=== GAME.GD BACKGROUND DEBUG ===")
+	if background != null:
+		print("Background node found")
+		print("  - Position: " + str(background.position))
+		print("  - Scale: " + str(background.scale))
+		print("  - Modulate: " + str(background.modulate))
+		print("  - Texture: " + str(background.texture))
+		print("  - Visible: " + str(background.visible))
+		print("  - z_index: " + str(background.z_index))
+		if background.texture != null:
+			print("  - Texture size: " + str(background.texture.get_size()))
+		else:
+			print("  - WARNING: Texture is null!")
+	else:
+		print("ERROR: Background node not found!")
+		print("Available children: " + str(get_children()))
+	print("=== END BACKGROUND DEBUG ===")
+	
 	GameManager.coins_changed.connect(_on_coins_changed)
 	GameManager.reset_coins()
 	_update_coin_label(0)
@@ -66,9 +85,8 @@ func _load_map(map_id: String) -> void:
 	if MapManager.load_map(map_id, tile_map):
 		var map_data = MapManager.get_current_map()
 
-		# Update background color
-		if background != null:
-			background.modulate = map_data.background_color
+		# Background color is no longer applied - wallpaper displays at full color
+		# Use white tint if you want to keep this feature: background.modulate = map_data.background_color
 
 		# Position host player at first spawn point
 		if host_player != null:
@@ -85,6 +103,19 @@ func _load_map(map_id: String) -> void:
 		if $PlayerManager:
 			$PlayerManager.spawn_points = map_data.spawn_points
 
+		# DEBUG: Check background after map load
+		print("=== POST-LOAD BACKGROUND DEBUG ===")
+		if background != null:
+			print("Background after load:")
+			print("  - Position: " + str(background.position))
+			print("  - Scale: " + str(background.scale))
+			print("  - Modulate: " + str(background.modulate))
+			print("  - Visible: " + str(background.visible))
+			print("  - z_index: " + str(background.z_index))
+		else:
+			print("ERROR: Background node not found after load!")
+		print("=== END POST-LOAD DEBUG ===")
+		
 		print("Map loaded: %s" % map_data.map_name)
 	else:
 		push_error("Failed to load map: %s" % map_id)

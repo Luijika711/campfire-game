@@ -25,10 +25,9 @@ sources/0 = SubResource("TileSetAtlasSource_grounds")
 script = ExtResource("1_main")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1531458808]
-modulate = Color(0.5, 0.7, 1, 1)
 z_index = -1
-position = Vector2(576, 324)
-scale = Vector2(1152, 648)
+position = Vector2(1005, 597)
+scale = Vector2(0.14325942, 0.12695313)
 texture = ExtResource("2_o6xl0")
 
 [node name="TileMap" type="TileMap" parent="." unique_id=1504328302]
@@ -55,6 +54,10 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -1.0
+offset_top = 8.0
+offset_right = -1.0
+offset_bottom = 8.0
 grow_horizontal = 2
 grow_vertical = 2
 

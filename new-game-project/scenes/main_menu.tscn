@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_menu"]
+[gd_scene format=3 uid="uid://bok3o3jcfdcc"]
 
-[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_main_menu"]
+[ext_resource type="Script" uid="uid://bthvhm8mp6kdl" path="res://scripts/main_menu.gd" id="1_main_menu"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=373683960]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main_menu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=245608857]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1664918280]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -35,44 +35,44 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=2009168777]
 layout_mode = 2
 theme_override_font_sizes/font_size = 72
 text = "2D PLATFORMER"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="VBoxContainer"]
+[node name="SubtitleLabel" type="Label" parent="VBoxContainer" unique_id=197952038]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 24
 text = "Multiplayer Platform Game"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="VBoxContainer"]
+[node name="Spacer" type="Control" parent="VBoxContainer" unique_id=324807607]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PlayButton" type="Button" parent="VBoxContainer"]
+[node name="PlayButton" type="Button" parent="VBoxContainer" unique_id=419032663]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "PLAY GAME"
 
-[node name="LevelSelectButton" type="Button" parent="VBoxContainer"]
+[node name="LevelSelectButton" type="Button" parent="VBoxContainer" unique_id=1218189034]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "SELECT LEVEL"
 
-[node name="SettingsButton" type="Button" parent="VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="VBoxContainer" unique_id=835237292]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "SETTINGS"
 
-[node name="QuitButton" type="Button" parent="VBoxContainer"]
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=242396670]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "QUIT"
 
-[node name="VersionLabel" type="Label" parent="."]
+[node name="VersionLabel" type="Label" parent="." unique_id=1543615486]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -85,7 +85,7 @@ offset_right = -20.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 16
 text = "v1.0.0"
 horizontal_alignment = 2

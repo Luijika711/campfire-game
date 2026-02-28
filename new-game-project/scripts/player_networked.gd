@@ -18,6 +18,10 @@ var player_color: String = "Red"
 var character_scale: float = 1.0
 var jumps_remaining: int = 2
 var is_dead: bool = false
+var weapon_label: Label = null
+var last_damage_source: Node = null
+
+signal player_died(killer: Node)
 
 # Analog input state
 var move_input: Vector2 = Vector2.ZERO
@@ -65,6 +69,7 @@ func _apply_setup(color: String, p_name: String):
 	if weapon_manager:
 		weapon_manager.weapon_changed.connect(_on_weapon_changed)
 
+	_create_weapon_label()
 	is_dead = false
 
 func handle_input(
@@ -145,6 +150,7 @@ func take_damage(amount: int, source: Node = null) -> void:
 	if is_dead or not health_component:
 		return
 
+	last_damage_source = source
 	health_component.take_damage(amount, source)
 
 	# Visual feedback
@@ -160,9 +166,8 @@ func _on_health_changed(current: int, max: int) -> void:
 func _on_health_depleted() -> void:
 	die()
 
-func _on_weapon_changed(_weapon: Weapon) -> void:
-	# Could update UI or effects here
-	pass
+func _on_weapon_changed(weapon: Weapon) -> void:
+	_update_weapon_label(weapon)
 
 func collect_coin() -> void:
 	GameManager.add_coin()
@@ -173,6 +178,16 @@ func die() -> void:
 
 	is_dead = true
 
+	# Determine killer
+	var killer: Node = null
+	if last_damage_source:
+		if last_damage_source.is_in_group("players"):
+			killer = last_damage_source
+		elif last_damage_source is Area2D and last_damage_source.get("shooter"):
+			killer = last_damage_source.shooter
+
+	player_died.emit(killer)
+
 	# Visual death effect
 	visual.modulate = Color(0.3, 0.3, 0.3, 0.5)
 
@@ -180,29 +195,38 @@ func die() -> void:
 	collision_layer = 0
 	collision_mask = 0
 
-	# Wait then respawn
-	await get_tree().create_timer(2.0).timeout
-	respawn()
+	# Hide weapon label
+	if weapon_label:
+		weapon_label.visible = false
 
-func respawn() -> void:
-	is_dead = false
+func _create_weapon_label() -> void:
+	weapon_label = Label.new()
+	weapon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	weapon_label.position = Vector2(-30, -55)
+	weapon_label.size = Vector2(60, 20)
+	weapon_label.add_theme_font_size_override("font_size", 10)
+	weapon_label.add_theme_color_override(
+		"font_color", Color(1, 1, 1, 0.8))
+	weapon_label.add_theme_color_override(
+		"font_shadow_color", Color(0, 0, 0, 0.6))
+	weapon_label.add_theme_constant_override("shadow_offset_x", 1)
+	weapon_label.add_theme_constant_override("shadow_offset_y", 1)
+	weapon_label.z_index = 30
+	add_child(weapon_label)
+	if weapon_manager:
+		var current = weapon_manager.get_current_weapon()
+		if current:
+			_update_weapon_label(current)
 
-	# Reset health
-	if health_component:
-		health_component.reset_health()
-
-	# Respawn at random spawn point
-	var spawn_points = get_parent().spawn_points
-	position = spawn_points[randi() % spawn_points.size()]
-	velocity = Vector2.ZERO
-
-	# Re-enable collision
-	collision_layer = 1
-	collision_mask = 7
-
-	# Reset visual
-	if visual and COLOR_MAP.has(player_color):
-		visual.modulate = COLOR_MAP[player_color]
-
-	# Reset jumps
-	jumps_remaining = 2
+func _update_weapon_label(weapon: Weapon) -> void:
+	if not weapon_label:
+		return
+	match weapon.weapon_type:
+		Weapon.WeaponType.MELEE_SWORD:
+			weapon_label.text = "Sword"
+		Weapon.WeaponType.GUN:
+			weapon_label.text = "Gun"
+		Weapon.WeaponType.LASER_GUN:
+			weapon_label.text = "Laser"
+		_:
+			weapon_label.text = weapon.weapon_name

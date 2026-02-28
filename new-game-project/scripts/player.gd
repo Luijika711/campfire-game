@@ -55,8 +55,10 @@ var _joy_aim: Vector2 = Vector2.ZERO
 
 # Aim indicator
 var aim_indicator: Polygon2D = null
+var weapon_label: Label = null
+var last_damage_source: Node = null
 
-signal player_died
+signal player_died(killer: Node)
 signal health_changed(current: int, max: int)
 signal weapon_changed(weapon: Weapon)
 
@@ -90,6 +92,9 @@ func _ready() -> void:
 
 	# Create aim indicator
 	_create_aim_indicator()
+
+	# Create weapon label above player
+	_create_weapon_label()
 
 	is_dead = false
 
@@ -428,6 +433,7 @@ func take_damage(amount: int, source: Node = null) -> void:
 	if is_dead or not health_component:
 		return
 
+	last_damage_source = source
 	health_component.take_damage(amount, source)
 
 	# Visual feedback
@@ -441,7 +447,18 @@ func die() -> void:
 		return
 
 	is_dead = true
-	player_died.emit()
+
+	# Determine killer from last damage source
+	var killer: Node = null
+	if last_damage_source:
+		if last_damage_source.is_in_group("players"):
+			killer = last_damage_source
+		elif last_damage_source.has_meta("player_id"):
+			killer = last_damage_source
+		elif last_damage_source is Area2D and last_damage_source.get("shooter"):
+			killer = last_damage_source.shooter
+
+	player_died.emit(killer)
 
 	# Play death animation
 	visual.play("death")
@@ -450,10 +467,13 @@ func die() -> void:
 	collision_layer = 0
 	collision_mask = 0
 
-	# Wait for death animation then reload scene
+	# Hide weapon label
+	if weapon_label:
+		weapon_label.visible = false
+
+	# Stay dead — no respawn
 	await visual.animation_finished
-	await get_tree().create_timer(0.5).timeout
-	get_tree().reload_current_scene()
+	visual.modulate = Color(0.3, 0.3, 0.3, 0.5)
 
 func collect_coin() -> void:
 	GameManager.add_coin()
@@ -472,6 +492,38 @@ func _on_health_depleted() -> void:
 
 func _on_weapon_changed(weapon: Weapon) -> void:
 	weapon_changed.emit(weapon)
+	_update_weapon_label(weapon)
+
+func _create_weapon_label() -> void:
+	weapon_label = Label.new()
+	weapon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	weapon_label.position = Vector2(-30, -60) / character_scale
+	weapon_label.size = Vector2(60, 20) / character_scale
+	weapon_label.add_theme_font_size_override("font_size", int(10 / character_scale))
+	weapon_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.8))
+	weapon_label.add_theme_color_override(
+		"font_shadow_color", Color(0, 0, 0, 0.6))
+	weapon_label.add_theme_constant_override("shadow_offset_x", 1)
+	weapon_label.add_theme_constant_override("shadow_offset_y", 1)
+	weapon_label.z_index = 30
+	add_child(weapon_label)
+	if weapon_manager:
+		var current = weapon_manager.get_current_weapon()
+		if current:
+			_update_weapon_label(current)
+
+func _update_weapon_label(weapon: Weapon) -> void:
+	if not weapon_label:
+		return
+	match weapon.weapon_type:
+		Weapon.WeaponType.MELEE_SWORD:
+			weapon_label.text = "Sword"
+		Weapon.WeaponType.GUN:
+			weapon_label.text = "Gun"
+		Weapon.WeaponType.LASER_GUN:
+			weapon_label.text = "Laser"
+		_:
+			weapon_label.text = weapon.weapon_name
 
 func get_current_weapon() -> Weapon:
 	if weapon_manager:

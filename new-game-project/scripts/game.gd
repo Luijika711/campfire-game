@@ -23,6 +23,9 @@ const PLAYER_SCENE := preload("res://scenes/player.tscn")
 var players: Dictionary = {}  # player_id -> player node
 var spawn_points: Array[Vector2] = []
 var current_player_index: int = 0  # For UI updates
+var kill_counts: Dictionary = {}  # player_id -> kills
+var player_names: Dictionary = {}  # player_id -> display name
+var leaderboard_label: Label = null
 
 func _ready() -> void:
 	GameManager.coins_changed.connect(_on_coins_changed)
@@ -56,6 +59,7 @@ func _ready() -> void:
 	# Update UI
 	_update_player_count()
 	_update_weapon_ui()
+	_create_leaderboard()
 
 	print("Game started with %d players!" % players.size())
 
@@ -179,6 +183,15 @@ func _spawn_player(player_data: PartyManager.PlayerData, spawn_index: int) -> vo
 	add_child(player)
 	players[player_data.player_id] = player
 
+	# Track for leaderboard
+	var display_name = player_data.player_name
+	player_names[player_data.player_id] = display_name
+	kill_counts[player_data.player_id] = 0
+
+	# Connect death signal for kill tracking
+	player.player_died.connect(
+		_on_player_killed.bind(player_data.player_id))
+
 	# Connect signals for host player (first player) UI
 	if players.size() == 1:
 		player.health_changed.connect(_on_player_health_changed)
@@ -275,3 +288,83 @@ func get_player(player_id: int) -> Node:
 
 func get_all_players() -> Dictionary:
 	return players.duplicate()
+
+func _create_leaderboard() -> void:
+	leaderboard_label = Label.new()
+	leaderboard_label.name = "Leaderboard"
+	leaderboard_label.anchors_preset = Control.PRESET_TOP_LEFT
+	leaderboard_label.position = Vector2(20, 10)
+	leaderboard_label.size = Vector2(200, 200)
+	leaderboard_label.add_theme_font_size_override("font_size", 16)
+	leaderboard_label.add_theme_color_override(
+		"font_color", Color(1, 1, 1, 0.9))
+	leaderboard_label.add_theme_color_override(
+		"font_shadow_color", Color(0, 0, 0, 0.7))
+	leaderboard_label.add_theme_constant_override("shadow_offset_x", 1)
+	leaderboard_label.add_theme_constant_override("shadow_offset_y", 1)
+	$CanvasLayer/UI.add_child(leaderboard_label)
+	_update_leaderboard()
+
+func _on_player_killed(killer: Node, victim_id: int) -> void:
+	if killer:
+		# Find killer's player_id
+		var killer_id = killer.get_meta("player_id", -1)
+		if killer_id >= 0 and kill_counts.has(killer_id):
+			# Don't count self-kills
+			if killer_id != victim_id:
+				kill_counts[killer_id] += 1
+	_update_leaderboard()
+	_check_game_over()
+
+func _update_leaderboard() -> void:
+	if not leaderboard_label:
+		return
+
+	var lines: Array[String] = ["-- Kills --"]
+	# Sort by kills descending
+	var sorted_ids = kill_counts.keys()
+	sorted_ids.sort_custom(func(a, b):
+		return kill_counts[a] > kill_counts[b])
+
+	for pid in sorted_ids:
+		var pname = player_names.get(pid, "P%d" % pid)
+		var kills = kill_counts[pid]
+		var dead_marker = ""
+		if players.has(pid) and players[pid].is_dead:
+			dead_marker = " [DEAD]"
+		lines.append("%s: %d%s" % [pname, kills, dead_marker])
+
+	leaderboard_label.text = "\n".join(lines)
+
+func _check_game_over() -> void:
+	var alive_count = 0
+	var last_alive_id = -1
+	for pid in players:
+		if not players[pid].is_dead:
+			alive_count += 1
+			last_alive_id = pid
+
+	if alive_count <= 1 and players.size() > 1:
+		if alive_count == 1:
+			var winner = player_names.get(last_alive_id, "???")
+			_show_game_over("%s wins!" % winner)
+		else:
+			_show_game_over("Draw!")
+
+func _show_game_over(message: String) -> void:
+	var game_over = Label.new()
+	game_over.name = "GameOverLabel"
+	game_over.text = message
+	game_over.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	game_over.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	game_over.anchors_preset = Control.PRESET_CENTER
+	game_over.position = Vector2(-200, -50)
+	game_over.size = Vector2(400, 100)
+	game_over.add_theme_font_size_override("font_size", 48)
+	game_over.add_theme_color_override(
+		"font_color", Color(1, 0.9, 0.3, 1))
+	game_over.add_theme_color_override(
+		"font_shadow_color", Color(0, 0, 0, 0.8))
+	game_over.add_theme_constant_override("shadow_offset_x", 2)
+	game_over.add_theme_constant_override("shadow_offset_y", 2)
+	$CanvasLayer/UI.add_child(game_over)

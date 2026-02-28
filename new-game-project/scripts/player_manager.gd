@@ -47,7 +47,17 @@ func _on_player_connected(player_id: int, player_name: String, color: String, te
 	add_child(player)
 	players[player_id] = player
 
-	print("Spawned player %d: %s at %s" % [player_id, player_name, str(spawn_pos)])
+	# Connect death signal if game tracks kills
+	var game = get_parent()
+	if game and game.has_method("_on_player_killed"):
+		player.player_died.connect(
+			game._on_player_killed.bind(player_id))
+		if "kill_counts" in game:
+			game.kill_counts[player_id] = 0
+			game.player_names[player_id] = player_name
+
+	print("Spawned player %d: %s at %s" % [
+		player_id, player_name, str(spawn_pos)])
 
 func _on_player_disconnected(player_id: int):
 	if players.has(player_id):

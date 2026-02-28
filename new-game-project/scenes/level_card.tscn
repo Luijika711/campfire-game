@@ -1,6 +1,22 @@
-[gd_scene load_steps=2 format=3 uid="uid://level_card"]
+[gd_scene load_steps=11 format=3 uid="uid://level_card"]
 
 [ext_resource type="Script" path="res://scripts/level_card.gd" id="1_level_card"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_normal.png" id="2_wood_btn_normal"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_pressed.png" id="3_wood_btn_pressed"]
+[ext_resource type="Texture2D" path="res://assets/ui/panels/wood_panel.png" id="4_wood_panel"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
+texture = ExtResource("2_wood_btn_normal")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
+texture = ExtResource("3_wood_btn_pressed")
+
+[sub_resource type="Theme" id="Theme_level_card"]
+Button/styles/normal = SubResource("StyleBoxButtonNormal")
+Button/styles/pressed = SubResource("StyleBoxButtonPressed")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
+texture = ExtResource("4_wood_panel")
 
 [node name="LevelCard" type="Control"]
 custom_minimum_size = Vector2(350, 250)
@@ -15,41 +31,49 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxPanel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = -10.0
-offset_bottom = -10.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="Thumbnail" type="TextureRect" parent="VBoxContainer"]
+[node name="Thumbnail" type="TextureRect" parent="Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
 text = "Level Name"
 horizontal_alignment = 1
 
-[node name="DescriptionLabel" type="Label" parent="VBoxContainer"]
+[node name="DescriptionLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "Level description goes here"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="SelectButton" type="Button" parent="VBoxContainer"]
+[node name="SelectButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme = SubResource("Theme_level_card")
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "PLAY"

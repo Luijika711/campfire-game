@@ -1,6 +1,22 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_menu"]
+[gd_scene load_steps=13 format=3 uid="uid://main_menu"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_main_menu"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_normal.png" id="2_wood_btn_normal"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_pressed.png" id="3_wood_btn_pressed"]
+[ext_resource type="Texture2D" path="res://assets/ui/panels/wood_panel.png" id="4_wood_panel"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
+texture = ExtResource("2_wood_btn_normal")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
+texture = ExtResource("3_wood_btn_pressed")
+
+[sub_resource type="Theme" id="Theme_main_menu"]
+Button/styles/normal = SubResource("StyleBoxButtonNormal")
+Button/styles/pressed = SubResource("StyleBoxButtonPressed")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
+texture = ExtResource("4_wood_panel")
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -20,56 +36,85 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Panel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -200.0
-offset_right = 200.0
-offset_bottom = 200.0
+offset_left = -250.0
+offset_top = -280.0
+offset_right = 250.0
+offset_bottom = 280.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
+theme_override_styles/panel = SubResource("StyleBoxPanel")
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 72
+theme_override_font_sizes/font_size = 56
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
 text = "2D PLATFORMER"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="VBoxContainer"]
+[node name="SubtitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "Multiplayer Platform Game"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="VBoxContainer"]
+[node name="Spacer" type="Control" parent="Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PlayButton" type="Button" parent="VBoxContainer"]
+[node name="PlayButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme = SubResource("Theme_main_menu")
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "PLAY GAME"
 
-[node name="LevelSelectButton" type="Button" parent="VBoxContainer"]
+[node name="LevelSelectButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme = SubResource("Theme_main_menu")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "SELECT LEVEL"
 
-[node name="SettingsButton" type="Button" parent="VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme = SubResource("Theme_main_menu")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "SETTINGS"
 
-[node name="QuitButton" type="Button" parent="VBoxContainer"]
+[node name="QuitButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme = SubResource("Theme_main_menu")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "QUIT"
 
 [node name="VersionLabel" type="Label" parent="."]

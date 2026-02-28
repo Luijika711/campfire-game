@@ -11,6 +11,7 @@ var current_ammo: int
 var is_firing: bool = false
 
 @onready var laser_beam: Line2D
+@onready var glow_beam: Line2D
 @onready var hit_effect: Polygon2D
 
 func _ready() -> void:
@@ -28,7 +29,12 @@ func _ready() -> void:
 	laser_beam.default_color = Color(0, 1, 1, 0.9)
 	laser_beam.gradient = create_laser_gradient()
 	laser_beam.visible = false
+	# Enable glow effect
+	laser_beam.modulate = Color(1, 1, 1, 1)
 	add_child(laser_beam)
+	
+	# Create glow effect for laser
+	_create_glow_beam()
 
 	# Create hit effect
 	hit_effect = Polygon2D.new()
@@ -124,6 +130,8 @@ func _fire_laser(direction: Vector2) -> void:
 	# Hide laser
 	await get_tree().create_timer(beam_duration).timeout
 	laser_beam.visible = false
+	if glow_beam:
+		glow_beam.visible = false
 	is_firing = false
 
 	start_cooldown()
@@ -140,6 +148,27 @@ func _show_hit_at(pos: Vector2) -> void:
 	tween.tween_property(effect, "scale", Vector2(2.0, 2.0), 0.1)
 	tween.parallel().tween_property(effect, "modulate:a", 0.0, 0.1)
 	tween.finished.connect(func(): effect.queue_free())
+
+func _create_glow_beam() -> void:
+	# Create a wider glow beam behind the main laser
+	glow_beam = Line2D.new()
+	glow_beam.name = "GlowBeam"
+	glow_beam.width = laser_width * 2.5
+	glow_beam.default_color = Color(0, 0.8, 1, 0.3)
+	glow_beam.gradient = create_glow_gradient()
+	glow_beam.visible = false
+	glow_beam.z_index = -1  # Render behind main beam
+	add_child(glow_beam)
+
+func create_glow_gradient() -> Gradient:
+	var gradient = Gradient.new()
+	gradient.colors = PackedColorArray([
+		Color(0, 1, 1, 0.5),   # Cyan center
+		Color(0, 0.5, 1, 0.2), # Blue outer
+		Color(0, 0.2, 1, 0)    # Fade
+	])
+	gradient.offsets = PackedFloat32Array([0.0, 0.4, 1.0])
+	return gradient
 
 func reload() -> void:
 	current_ammo = max_ammo

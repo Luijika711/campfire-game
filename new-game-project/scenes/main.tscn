@@ -7,6 +7,12 @@
 [ext_resource type="PackedScene" path="res://scenes/player_networked.tscn" id="5_player_networked"]
 [ext_resource type="Script" uid="uid://b8eydbaqtv2xa" path="res://scripts/player_manager.gd" id="6_player_manager"]
 [ext_resource type="PackedScene" path="res://scenes/qr_display.tscn" id="7_qr_display"]
+[ext_resource type="Texture2D" path="res://assets/ui/special-bars/life_bar_empty.png" id="8_life_bar_empty"]
+[ext_resource type="Texture2D" path="res://assets/ui/special-bars/life_bar_filled.png" id="9_life_bar_filled"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_normal.png" id="10_wood_btn_normal"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_pressed.png" id="11_wood_btn_pressed"]
+[ext_resource type="Texture2D" path="res://assets/ui/panels/wood_panel.png" id="12_wood_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/wood_sword.png" id="13_wood_sword"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_grounds"]
 texture_region_size = Vector2i(32, 32)
@@ -21,6 +27,37 @@ physics_layer_0/collision_layer = 2
 physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_grounds")
 
+[sub_resource type="Environment" id="Environment_glow"]
+background_mode = 3
+glow_enabled = true
+glow_intensity = 0.8
+glow_strength = 1.2
+glow_bloom = 0.3
+glow_hdr_threshold = 0.9
+glow_hdr_scale = 2.0
+glow_blend_mode = 1
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxHealthBarBackground"]
+texture = ExtResource("8_life_bar_empty")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxHealthBarFill"]
+texture = ExtResource("9_life_bar_filled")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
+texture = ExtResource("10_wood_btn_normal")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
+texture = ExtResource("11_wood_btn_pressed")
+
+[sub_resource type="Theme" id="Theme_game_ui"]
+Button/styles/normal = SubResource("StyleBoxButtonNormal")
+Button/styles/pressed = SubResource("StyleBoxButtonPressed")
+ProgressBar/styles/background = SubResource("StyleBoxHealthBarBackground")
+ProgressBar/styles/fill = SubResource("StyleBoxHealthBarFill")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
+texture = ExtResource("12_wood_panel")
+
 [node name="Main" type="Node2D" unique_id=2080572181]
 script = ExtResource("1_main")
 
@@ -30,6 +67,9 @@ z_index = -1
 position = Vector2(576, 324)
 scale = Vector2(1152, 648)
 texture = ExtResource("2_o6xl0")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_glow")
 
 [node name="TileMap" type="TileMap" parent="." unique_id=1504328302]
 tile_set = SubResource("TileSet_main")
@@ -63,12 +103,16 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -150.0
+offset_left = -180.0
 offset_top = 20.0
 offset_right = -20.0
 offset_bottom = 50.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
 text = "Coins: 0"
 horizontal_alignment = 2
 
@@ -77,13 +121,13 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -150.0
-offset_top = 50.0
+offset_left = -180.0
+offset_top = 145.0
 offset_right = -20.0
-offset_bottom = 80.0
+offset_bottom = 170.0
 grow_horizontal = 0
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "Players: 1/8"
 horizontal_alignment = 2
 
@@ -94,22 +138,41 @@ anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 20.0
 offset_top = -50.0
-offset_right = 400.0
+offset_right = 500.0
 offset_bottom = -20.0
 grow_vertical = 0
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 0.9)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
 text = "WASD/Arrows: Move | Space: Jump | S/Down: Fast Fall | Double-tap A/D: Dash | Mouse: Aim/Shoot | 1/2/3: Switch Weapons | ESC: Quit"
 
-[node name="HealthBar" type="ProgressBar" parent="CanvasLayer/UI" unique_id=1464769560]
+[node name="HealthPanel" type="Panel" parent="CanvasLayer/UI" unique_id=1464769565]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -200.0
-offset_top = 80.0
-offset_right = -20.0
-offset_bottom = 100.0
+offset_left = -210.0
+offset_top = 55.0
+offset_right = -15.0
+offset_bottom = 95.0
 grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxPanel")
+
+[node name="HealthBar" type="ProgressBar" parent="CanvasLayer/UI/HealthPanel" unique_id=1464769560]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_game_ui")
 value = 100.0
+show_percentage = false
 
 [node name="HealthLabel" type="Label" parent="CanvasLayer/UI" unique_id=1464769561]
 layout_mode = 1
@@ -117,39 +180,61 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -200.0
-offset_top = 105.0
+offset_top = 98.0
 offset_right = -20.0
-offset_bottom = 130.0
+offset_bottom = 120.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
 text = "Health: 100/100"
-horizontal_alignment = 2
+horizontal_alignment = 1
 
-[node name="Weapon1Label" type="Label" parent="CanvasLayer/UI" unique_id=1464769562]
+[node name="WeaponPanel" type="Panel" parent="CanvasLayer/UI" unique_id=1464769566]
 layout_mode = 1
-offset_left = 20.0
-offset_top = 60.0
+offset_left = 15.0
+offset_top = 55.0
+offset_right = 220.0
+offset_bottom = 140.0
+theme_override_styles/panel = SubResource("StyleBoxPanel")
+
+[node name="WeaponIcon" type="TextureRect" parent="CanvasLayer/UI/WeaponPanel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 42.0
+offset_bottom = 40.0
+texture = ExtResource("13_wood_sword")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Weapon1Label" type="Label" parent="CanvasLayer/UI/WeaponPanel" unique_id=1464769562]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 8.0
 offset_right = 200.0
-offset_bottom = 85.0
-theme_override_font_sizes/font_size = 18
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
 text = "[1] Sword"
 
-[node name="Weapon2Label" type="Label" parent="CanvasLayer/UI" unique_id=1464769563]
-layout_mode = 1
-offset_left = 20.0
-offset_top = 85.0
+[node name="Weapon2Label" type="Label" parent="CanvasLayer/UI/WeaponPanel" unique_id=1464769563]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 32.0
 offset_right = 200.0
-offset_bottom = 110.0
-theme_override_font_sizes/font_size = 18
+offset_bottom = 54.0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "[2] Gun: 30/30"
 
-[node name="Weapon3Label" type="Label" parent="CanvasLayer/UI" unique_id=1464769564]
-layout_mode = 1
-offset_left = 20.0
-offset_top = 110.0
+[node name="Weapon3Label" type="Label" parent="CanvasLayer/UI/WeaponPanel" unique_id=1464769564]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 56.0
 offset_right = 200.0
-offset_bottom = 135.0
-theme_override_font_sizes/font_size = 18
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "[3] Laser: 20/20"
 
 [node name="ShowQRButton" type="Button" parent="CanvasLayer/UI" unique_id=1464769557]
@@ -159,12 +244,16 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -120.0
+offset_left = -140.0
 offset_top = -80.0
 offset_right = -20.0
 offset_bottom = -20.0
 grow_horizontal = 0
 grow_vertical = 0
+theme = SubResource("Theme_game_ui")
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "Show QR Code"
 
 [node name="QRDisplay" parent="CanvasLayer" unique_id=343623238 instance=ExtResource("7_qr_display")]

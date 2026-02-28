@@ -1,0 +1,69 @@
+[gd_scene load_steps=6 format=3 uid="uid://player_slot"]
+
+[ext_resource type="Script" path="res://scripts/player_slot.gd" id="1_slot"]
+[ext_resource type="Texture2D" uid="uid://c2cv5o83fngbo" path="res://assets/ui/panels/wood_panel.png" id="2_panel"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
+texture = ExtResource("2_panel")
+
+[sub_resource type="Gradient" id="Gradient_color"]
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_color"]
+gradient = SubResource("Gradient_color")
+width = 40
+height = 40
+
+[node name="PlayerSlot" type="Panel"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxPanel")
+script = ExtResource("1_slot")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="ColorPreview" type="TextureRect" parent="HBoxContainer"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+texture = SubResource("GradientTexture_color")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+text = "Player 1"
+
+[node name="DeviceLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Keyboard/Mouse"
+
+[node name="ReadyCheckBox" type="CheckBox" parent="HBoxContainer"]
+layout_mode = 2
+text = "READY"
+
+[node name="LeaveButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Leave"

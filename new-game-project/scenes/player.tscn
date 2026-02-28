@@ -1,72 +1,67 @@
-[gd_scene load_steps=12 format=3 uid="uid://player123"]
+[gd_scene format=3 uid="uid://player123"]
 
-[ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
-[ext_resource type="Script" path="res://scripts/health_component.gd" id="2_health"]
-[ext_resource type="Script" path="res://scripts/weapon_manager.gd" id="3_weapon_manager"]
+[ext_resource type="Script" uid="uid://caogu1l5eiugr" path="res://scripts/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://ct67yc1vthebw" path="res://scripts/health_component.gd" id="2_health"]
+[ext_resource type="Script" uid="uid://dlxkbsmecf7mt" path="res://scripts/weapon_manager.gd" id="3_weapon_manager"]
 [ext_resource type="PackedScene" path="res://scenes/melee_sword.tscn" id="4_melee_sword"]
-[ext_resource type="PackedScene" path="res://scenes/gun.tscn" id="5_gun"]
+[ext_resource type="PackedScene" uid="uid://gun" path="res://scenes/gun.tscn" id="5_gun"]
 [ext_resource type="PackedScene" path="res://scenes/laser_gun.tscn" id="6_laser_gun"]
-[ext_resource type="PackedScene" uid="uid://health_bar" path="res://scenes/health_bar.tscn" id="7_health_bar"]
-[ext_resource type="PackedScene" uid="uid://walk_dust" path="res://scenes/particles/walk_dust.tscn" id="8_walk_dust"]
-[ext_resource type="PackedScene" uid="uid://jump_dust" path="res://scenes/particles/jump_dust.tscn" id="9_jump_dust"]
-[ext_resource type="PackedScene" uid="uid://land_dust" path="res://scenes/particles/land_dust.tscn" id="10_land_dust"]
-[ext_resource type="PackedScene" uid="uid://dash_trail" path="res://scenes/particles/dash_trail.tscn" id="11_dash_trail"]
-[ext_resource type="SpriteFrames" path="res://assets/characters/male_adventurer/male_adventurer_sprites.tres" id="12_sprites"]
+[ext_resource type="PackedScene" path="res://scenes/health_bar.tscn" id="7_health_bar"]
+[ext_resource type="PackedScene" path="res://scenes/particles/walk_dust.tscn" id="8_walk_dust"]
+[ext_resource type="PackedScene" path="res://scenes/particles/jump_dust.tscn" id="9_jump_dust"]
+[ext_resource type="PackedScene" path="res://scenes/particles/land_dust.tscn" id="10_land_dust"]
+[ext_resource type="PackedScene" path="res://scenes/particles/dash_trail.tscn" id="11_dash_trail"]
+[ext_resource type="SpriteFrames" uid="uid://csssvorbgkbcv" path="res://assets/characters/male_adventurer/male_adventurer_sprites.tres" id="12_sprites"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(24, 40)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3v2ag"]
+radius = 7.0
+height = 26.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hazard"]
-size = Vector2(24, 40)
-
-[node name="Player" type="CharacterBody2D" groups=["player"]]
-collision_layer = 1
+[node name="Player" type="CharacterBody2D" unique_id=121071109 groups=["player"]]
 collision_mask = 7
 script = ExtResource("1_player")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1789165599]
 z_index = 10
 position = Vector2(0, -4)
 sprite_frames = ExtResource("12_sprites")
 animation = &"idle_down"
 autoplay = "idle_down"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 8)
-shape = SubResource("RectangleShape2D_player")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=397140426]
+position = Vector2(1, -5)
+shape = SubResource("CapsuleShape2D_3v2ag")
 
-[node name="HazardDetector" type="Area2D" parent="."]
+[node name="HazardDetector" type="Area2D" parent="." unique_id=1621523857]
 collision_layer = 0
 collision_mask = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HazardDetector"]
-position = Vector2(0, 8)
-shape = SubResource("RectangleShape2D_hazard")
-
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=34015201]
 script = ExtResource("2_health")
-max_health = 100
-current_health = 100
 
-[node name="WeaponManager" type="Node2D" parent="."]
+[node name="WeaponManager" type="Node2D" parent="." unique_id=1248334815]
 script = ExtResource("3_weapon_manager")
-weapon_slots = [ExtResource("4_melee_sword"), ExtResource("5_gun"), ExtResource("6_laser_gun")]
+weapon_slots = Array[PackedScene]([ExtResource("4_melee_sword"), ExtResource("5_gun"), ExtResource("6_laser_gun")])
 
-[node name="HealthBar" parent="." instance=ExtResource("7_health_bar")]
+[node name="HealthBar" parent="." unique_id=316561037 instance=ExtResource("7_health_bar")]
 z_index = 20
-position = Vector2(-30, -50)
+offset_left = -30.0
+offset_top = -50.0
+offset_right = 30.0
+offset_bottom = -23.0
 
-[node name="Particles" type="Node2D" parent="."]
+[node name="Particles" type="Node2D" parent="." unique_id=916847543]
 
-[node name="WalkDust" parent="Particles" instance=ExtResource("8_walk_dust")]
-position = Vector2(0, 30)
+[node name="WalkDust" parent="Particles" unique_id=1370214058 instance=ExtResource("8_walk_dust")]
+position = Vector2(0, 8)
 
-[node name="JumpDust" parent="Particles" instance=ExtResource("9_jump_dust")]
-position = Vector2(0, 30)
+[node name="JumpDust" parent="Particles" unique_id=1863220174 instance=ExtResource("9_jump_dust")]
+position = Vector2(0, 8)
 
-[node name="LandDust" parent="Particles" instance=ExtResource("10_land_dust")]
-position = Vector2(0, 30)
+[node name="LandDust" parent="Particles" unique_id=564944284 instance=ExtResource("10_land_dust")]
+position = Vector2(0, 8)
 
-[node name="DashTrail" parent="Particles" instance=ExtResource("11_dash_trail")]
+[node name="DashTrail" parent="Particles" unique_id=321446350 instance=ExtResource("11_dash_trail")]
+position = Vector2(0, -22)
 
 [connection signal="body_entered" from="HazardDetector" to="." method="_on_hazard_detector_body_entered"]

@@ -1,10 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://game_scene"]
+[gd_scene load_steps=8 format=3 uid="uid://game_scene"]
 
 [ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
-[ext_resource type="PackedScene" uid="uid://player123" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://goal123" path="res://scenes/goal.tscn" id="3_goal"]
-[ext_resource type="PackedScene" path="res://scenes/player_networked.tscn" id="4_player_networked"]
-[ext_resource type="Script" path="res://scripts/player_manager.gd" id="5_player_manager"]
 [ext_resource type="PackedScene" path="res://scenes/qr_display.tscn" id="6_qr_display"]
 [ext_resource type="PackedScene" uid="uid://pause_menu" path="res://scenes/pause_menu.tscn" id="7_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://enemy_spawner" path="res://scenes/enemy_spawner.tscn" id="8_enemy_spawner"]
@@ -19,13 +16,6 @@ current_map_id = "basic"
 [node name="GameCamera" type="Camera2D" parent="."]
 script = ExtResource("10_camera")
 position = Vector2(960, 540)
-
-[node name="HostPlayer" parent="." instance=ExtResource("2_player")]
-position = Vector2(100, 400)
-
-[node name="PlayerManager" type="Node2D" parent="."]
-script = ExtResource("5_player_manager")
-player_scene = ExtResource("4_player_networked")
 
 [node name="Coins" type="Node2D" parent="."]
 
@@ -71,7 +61,7 @@ offset_bottom = 80.0
 grow_horizontal = 0
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 18
-text = "Players: 1/8"
+text = "Players: 0/8"
 horizontal_alignment = 2
 
 [node name="HealthBar" type="ProgressBar" parent="CanvasLayer/UI"]

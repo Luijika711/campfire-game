@@ -30,4 +30,4 @@ func _on_level_selected(map_id: String):
 
 func _on_back_pressed():
 	AudioManager.play_sfx(click_sound)
-	SceneManager.change_scene("res://scenes/main_menu.tscn")
+	SceneManager.change_scene("res://scenes/party_lobby.tscn")

@@ -33,7 +33,7 @@ func _title_animation():
 
 func _on_play_pressed():
 	AudioManager.play_sfx(click_sound)
-	SceneManager.change_scene("res://scenes/game.tscn")
+	SceneManager.change_scene("res://scenes/party_lobby.tscn")
 
 func _on_level_select_pressed():
 	AudioManager.play_sfx(click_sound)

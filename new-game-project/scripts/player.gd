@@ -15,7 +15,7 @@ extends CharacterBody2D
 @export var team: int = 0  # TeamManager.Team.NONE
 @export var character_scale: float = 1.0
 
-@onready var visual: Sprite2D = $Sprite2D
+@onready var visual: AnimatedSprite2D = $AnimatedSprite2D
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var weapon_manager: WeaponManager = $WeaponManager
 @onready var health_bar: ProgressBar = $HealthBar
@@ -41,6 +41,8 @@ var current_slope_angle: float = 0.0
 
 var last_aim_direction: Vector2 = Vector2.RIGHT
 var is_dead: bool = false
+var is_attacking: bool = false
+var facing_direction: String = "right"
 
 signal player_died
 signal health_changed(current: int, max: int)
@@ -68,6 +70,9 @@ func _ready() -> void:
 	if weapon_manager:
 		weapon_manager.weapon_changed.connect(_on_weapon_changed)
 
+	# Connect animation finished signal
+	visual.animation_finished.connect(_on_animation_finished)
+
 	is_dead = false
 
 func _physics_process(delta: float) -> void:
@@ -83,6 +88,7 @@ func _physics_process(delta: float) -> void:
 			is_dashing = false
 			can_dash = true
 		move_and_slide()
+		_update_animation()
 		return
 
 	# Get movement input
@@ -153,7 +159,6 @@ func _physics_process(delta: float) -> void:
 	# Normal movement (only if not sliding)
 	if not is_sliding:
 		if direction != 0:
-			visual.flip_h = direction < 0
 			velocity.x = direction * speed
 		elif not on_slope:  # Don't zero x velocity on slopes
 			velocity.x = 0
@@ -184,6 +189,7 @@ func _physics_process(delta: float) -> void:
 	was_on_floor = is_on_floor()
 
 	_check_double_tap_dash()
+	_update_animation()
 
 func _apply_gravity(delta: float) -> void:
 	if Input.is_action_pressed("move_down"):
@@ -231,6 +237,55 @@ func _trigger_dash(direction: int) -> void:
 	if dash_trail:
 		dash_trail.emitting = false
 
+func _update_animation() -> void:
+	if is_dead:
+		return
+	
+	if is_attacking:
+		return
+	
+	# Determine facing direction based on aim/mouse
+	var mouse_pos = get_global_mouse_position()
+	var aim_direction = (mouse_pos - global_position).normalized()
+	
+	# Update facing direction based on aim
+	if abs(aim_direction.x) > abs(aim_direction.y):
+		# Horizontal facing
+		if aim_direction.x > 0:
+			facing_direction = "right"
+		else:
+			facing_direction = "left"
+	else:
+		# Vertical facing
+		if aim_direction.y > 0:
+			facing_direction = "down"
+		else:
+			facing_direction = "up"
+	
+	# Determine animation state
+	var animation_name: String
+	
+	if is_dashing:
+		animation_name = "dash_" + facing_direction
+	elif not is_on_floor():
+		animation_name = "jump_" + facing_direction
+	elif abs(velocity.x) > 10:
+		# Running or walking based on speed
+		if abs(velocity.x) > speed * 0.8:
+			animation_name = "run_" + facing_direction
+		else:
+			animation_name = "walk_" + facing_direction
+	else:
+		animation_name = "idle_" + facing_direction
+	
+	# Play animation if different
+	if visual.animation != animation_name:
+		visual.play(animation_name)
+
+func _on_animation_finished() -> void:
+	if is_attacking:
+		is_attacking = false
+
 func take_damage(amount: int, source: Node = null) -> void:
 	if is_dead or not health_component:
 		return
@@ -250,15 +305,16 @@ func die() -> void:
 	is_dead = true
 	player_died.emit()
 
-	# Death animation/effect
-	visual.modulate = Color(0.3, 0.3, 0.3, 1)
+	# Play death animation
+	visual.play("death")
 
 	# Disable collision
 	collision_layer = 0
 	collision_mask = 0
 
-	# Wait a moment then reload scene
-	await get_tree().create_timer(1.0).timeout
+	# Wait for death animation then reload scene
+	await visual.animation_finished
+	await get_tree().create_timer(0.5).timeout
 	get_tree().reload_current_scene()
 
 func collect_coin() -> void:
@@ -304,4 +360,10 @@ func _handle_weapon_attack() -> void:
 
 	# Check for shoot/attack input
 	if Input.is_action_pressed("shoot") and weapon_manager:
+		# Play attack animation for melee weapons
+		var current_weapon = weapon_manager.get_current_weapon()
+		if current_weapon and current_weapon.is_melee and not is_attacking:
+			is_attacking = true
+			visual.play("attack_" + facing_direction)
+		
 		weapon_manager.attack(last_aim_direction)

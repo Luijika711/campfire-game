@@ -1,0 +1,299 @@
+#!/usr/bin/env python3
+"""
+New Level Generator for Godot Project (Interactive)
+Creates new levels by duplicating existing ones or from a template.
+"""
+
+import os
+import re
+import sys
+from pathlib import Path
+
+# Project paths
+PROJECT_ROOT = Path(__file__).parent
+LEVELS_DIR = PROJECT_ROOT / "scenes" / "levels"
+TEMPLATE_LEVEL = LEVELS_DIR / "basic" / "level.tscn"
+
+def clear_screen():
+    """Clear the terminal screen."""
+    os.system('clear' if os.name != 'nt' else 'cls')
+
+def print_header():
+    """Print the script header."""
+    print("=" * 60)
+    print("       NEW LEVEL GENERATOR FOR GODOT PROJECT")
+    print("=" * 60)
+    print()
+
+def get_existing_levels():
+    """Get list of existing level directories."""
+    if not LEVELS_DIR.exists():
+        return []
+    return sorted([d.name for d in LEVELS_DIR.iterdir() if d.is_dir()])
+
+def generate_uid():
+    """Generate a random unique ID for Godot nodes."""
+    import random
+    return random.randint(100000000, 999999999)
+
+def replace_uids(content):
+    """Replace UIDs in the content with new ones."""
+    def replace_id(match):
+        return f"unique_id={generate_uid()}"
+    
+    content = re.sub(r'unique_id=\d+', replace_id, content)
+    
+    # Also need to update the scene UID at the top
+    uid_pattern = r'\[gd_scene format=3 uid="uid://([a-z0-9]+)"'
+    
+    def replace_scene_uid(match):
+        import random
+        import string
+        new_uid = ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
+        return f'[gd_scene format=3 uid="uid://{new_uid}"'
+    
+    content = re.sub(uid_pattern, replace_scene_uid, content)
+    
+    return content
+
+def update_level_name(content, name):
+    """Update the level name in the content."""
+    # Convert snake_case or kebab-case to Title Case
+    display_name = name.replace('_', ' ').replace('-', ' ').title()
+    content = re.sub(r'level_name = "[^"]*"', f'level_name = "{display_name}"', content)
+    return content
+
+def validate_level_name(name):
+    """Validate the level name."""
+    if not name:
+        return False, "Name cannot be empty"
+    if not re.match(r'^[a-zA-Z][a-zA-Z0-9_-]*$', name):
+        return False, "Name must start with a letter and contain only letters, numbers, underscores, and hyphens"
+    if (LEVELS_DIR / name).exists():
+        return False, f"Level '{name}' already exists"
+    return True, None
+
+def create_level_from_template(name, template_path=None):
+    """Create a new level by copying from a template."""
+    template_path = template_path or TEMPLATE_LEVEL
+    
+    if not template_path.exists():
+        print(f"Error: Template not found at {template_path}")
+        return False
+    
+    # Create level directory
+    level_dir = LEVELS_DIR / name
+    level_dir.mkdir(parents=True)
+    
+    # Read template
+    with open(template_path, 'r') as f:
+        content = f.read()
+    
+    # Replace UIDs and update name
+    content = replace_uids(content)
+    content = update_level_name(content, name)
+    
+    # Update node name (only root node - doesn't have parent=".")
+    node_name = name.replace('_', ' ').replace('-', ' ').title().replace(' ', '')
+    content = re.sub(r'\[node name="[^"]*" type="Node2D"(?! parent="\.")', f'[node name="Level{node_name}" type="Node2D"', content)
+    
+    # Write new level
+    level_file = level_dir / "level.tscn"
+    with open(level_file, 'w') as f:
+        f.write(content)
+    
+    return True
+
+def create_empty_level(name):
+    """Create a minimal new level with basic structure."""
+    level_dir = LEVELS_DIR / name
+    level_dir.mkdir(parents=True)
+    
+    display_name = name.replace('_', ' ').replace('-', ' ').title()
+    node_name = display_name.replace(' ', '')
+    
+    content = f'''[gd_scene format=3 uid="uid://clgdytxwaysrx"]
+
+[ext_resource type="Script" uid="uid://clk2u0lgieqwe" path="res://scripts/level_base.gd" id="1_script"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_h3wap"]
+load_path = "res://.godot/imported/tile_atlas.png-f20f463f080df8ef4c68366accb9fb7b.ctex"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_basic"]
+texture = SubResource("CompressedTexture2D_h3wap")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_basic"]
+physics_layer_0/collision_layer = 2
+physics_layer_0/collision_mask = 0
+sources/0 = SubResource("TileSetAtlasSource_basic")
+
+[node name="Level{node_name}" type="Node2D" unique_id={generate_uid()}]
+script = ExtResource("1_script")
+level_name = "{display_name}"
+description = "A new level"
+
+[node name="TileMap" type="TileMap" parent="." unique_id={generate_uid()}]
+tile_set = SubResource("TileSet_basic")
+format = 2
+layer_0/name = "Ground"
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id={generate_uid()}]
+
+[node name="Spawn0" type="Marker2D" parent="SpawnPoints" unique_id={generate_uid()}]
+position = Vector2(100, 100)
+
+[node name="CoinPositions" type="Node2D" parent="." unique_id={generate_uid()}]
+
+[node name="GoalPosition" type="Marker2D" parent="." unique_id={generate_uid()}]
+position = Vector2(500, 100)
+'''
+    
+    level_file = level_dir / "level.tscn"
+    with open(level_file, 'w') as f:
+        f.write(content)
+    
+    return True
+
+def list_levels():
+    """List all existing levels."""
+    levels = get_existing_levels()
+    if not levels:
+        print("No levels found.")
+        return
+    
+    print("\nExisting levels:")
+    for i, level in enumerate(levels, 1):
+        level_file = LEVELS_DIR / level / "level.tscn"
+        if level_file.exists():
+            print(f"  {i}. {level}")
+        else:
+            print(f"  {i}. {level} (no level.tscn)")
+    print()
+    return levels
+
+def select_template():
+    """Let user select a template level."""
+    levels = list_levels()
+    
+    if not levels:
+        print("No templates available!")
+        return None
+    
+    while True:
+        choice = input("Select a template level (number or name, Enter for 'basic'): ").strip()
+        
+        if not choice:
+            return TEMPLATE_LEVEL
+        
+        # Check if it's a number
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(levels):
+                return LEVELS_DIR / levels[idx] / "level.tscn"
+            else:
+                print(f"Invalid number. Please enter 1-{len(levels)}")
+                continue
+        
+        # Check if it's a name
+        if choice in levels:
+            return LEVELS_DIR / choice / "level.tscn"
+        
+        print(f"Level '{choice}' not found. Try again.")
+
+def prompt_for_level_name():
+    """Prompt user for a level name."""
+    while True:
+        name = input("\nEnter level name (snake_case recommended): ").strip()
+        
+        valid, error = validate_level_name(name)
+        if valid:
+            return name
+        else:
+            print(f"  Error: {error}")
+
+def show_main_menu():
+    """Show the main menu and get user choice."""
+    print("\nWhat would you like to do?")
+    print("  1. Create new level from template")
+    print("  2. Create empty level (minimal structure)")
+    print("  3. List existing levels")
+    print("  4. Exit")
+    
+    while True:
+        choice = input("\nEnter choice (1-4): ").strip()
+        if choice in ['1', '2', '3', '4']:
+            return choice
+        print("Invalid choice. Please enter 1, 2, 3, or 4.")
+
+def main():
+    clear_screen()
+    print_header()
+    
+    # Check if levels directory exists
+    if not LEVELS_DIR.exists():
+        print(f"Error: Levels directory not found at {LEVELS_DIR}")
+        print("Please run this script from the project root.")
+        return 1
+    
+    while True:
+        choice = show_main_menu()
+        
+        if choice == '1':
+            # Create from template
+            print("\n" + "-" * 60)
+            print("Create level from template")
+            print("-" * 60)
+            
+            template_path = select_template()
+            if not template_path:
+                continue
+            
+            level_name = prompt_for_level_name()
+            
+            print(f"\nCreating level '{level_name}' from template...")
+            if create_level_from_template(level_name, template_path):
+                print(f"\n✓ SUCCESS! Created new level: {level_name}")
+                print(f"  Location: scenes/levels/{level_name}/level.tscn")
+                print("\nNext steps:")
+                print(f"  1. Open Godot and load: res://scenes/levels/{level_name}/level.tscn")
+                print(f"  2. Edit the level in the editor")
+            else:
+                print("\n✗ Failed to create level.")
+        
+        elif choice == '2':
+            # Create empty level
+            print("\n" + "-" * 60)
+            print("Create empty level")
+            print("-" * 60)
+            
+            level_name = prompt_for_level_name()
+            
+            print(f"\nCreating empty level '{level_name}'...")
+            if create_empty_level(level_name):
+                print(f"\n✓ SUCCESS! Created empty level: {level_name}")
+                print(f"  Location: scenes/levels/{level_name}/level.tscn")
+                print("\nNext steps:")
+                print(f"  1. Open Godot and load: res://scenes/levels/{level_name}/level.tscn")
+                print(f"  2. Add tiles, spawn points, coins, etc.")
+            else:
+                print("\n✗ Failed to create level.")
+        
+        elif choice == '3':
+            # List levels
+            list_levels()
+        
+        elif choice == '4':
+            # Exit
+            print("\nGoodbye!")
+            return 0
+        
+        input("\nPress Enter to continue...")
+        clear_screen()
+        print_header()
+
+if __name__ == '__main__':
+    sys.exit(main())

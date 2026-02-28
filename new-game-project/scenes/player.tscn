@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://player123"]
+[gd_scene load_steps=12 format=3 uid="uid://player123"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/health_component.gd" id="2_health"]
@@ -11,31 +11,27 @@
 [ext_resource type="PackedScene" uid="uid://jump_dust" path="res://scenes/particles/jump_dust.tscn" id="9_jump_dust"]
 [ext_resource type="PackedScene" uid="uid://land_dust" path="res://scenes/particles/land_dust.tscn" id="10_land_dust"]
 [ext_resource type="PackedScene" uid="uid://dash_trail" path="res://scenes/particles/dash_trail.tscn" id="11_dash_trail"]
-
-[sub_resource type="Gradient" id="Gradient_player"]
-colors = PackedColorArray(1, 0.2, 0.2, 1, 0.8, 0.1, 0.1, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_player"]
-gradient = SubResource("Gradient_player")
-width = 32
-height = 48
+[ext_resource type="SpriteFrames" path="res://assets/characters/male_adventurer/male_adventurer_sprites.tres" id="12_sprites"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(28, 44)
+size = Vector2(32, 56)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hazard"]
-size = Vector2(28, 44)
+size = Vector2(32, 56)
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 collision_layer = 1
 collision_mask = 7
 script = ExtResource("1_player")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 10
-texture = SubResource("GradientTexture2D_player")
+sprite_frames = ExtResource("12_sprites")
+animation = &"idle_right"
+autoplay = "idle_right"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_player")
 
 [node name="HazardDetector" type="Area2D" parent="."]
@@ -43,6 +39,7 @@ collision_layer = 0
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HazardDetector"]
+position = Vector2(0, 4)
 shape = SubResource("RectangleShape2D_hazard")
 
 [node name="HealthComponent" type="Node" parent="."]
@@ -56,18 +53,18 @@ weapon_slots = [ExtResource("4_melee_sword"), ExtResource("5_gun"), ExtResource(
 
 [node name="HealthBar" parent="." instance=ExtResource("7_health_bar")]
 z_index = 20
-position = Vector2(-30, -40)
+position = Vector2(-30, -50)
 
 [node name="Particles" type="Node2D" parent="."]
 
 [node name="WalkDust" parent="Particles" instance=ExtResource("8_walk_dust")]
-position = Vector2(0, 22)
+position = Vector2(0, 30)
 
 [node name="JumpDust" parent="Particles" instance=ExtResource("9_jump_dust")]
-position = Vector2(0, 22)
+position = Vector2(0, 30)
 
 [node name="LandDust" parent="Particles" instance=ExtResource("10_land_dust")]
-position = Vector2(0, 22)
+position = Vector2(0, 30)
 
 [node name="DashTrail" parent="Particles" instance=ExtResource("11_dash_trail")]
 

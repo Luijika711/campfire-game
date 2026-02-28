@@ -1,6 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://level_select"]
+[gd_scene load_steps=12 format=3 uid="uid://level_select"]
 
 [ext_resource type="Script" path="res://scripts/level_select.gd" id="1_level_select"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_normal.png" id="2_wood_btn_normal"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_pressed.png" id="3_wood_btn_pressed"]
+[ext_resource type="Texture2D" path="res://assets/ui/panels/wood_panel.png" id="4_wood_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/scroll/wood_scrollbar.png" id="5_wood_scrollbar"]
+[ext_resource type="Texture2D" path="res://assets/ui/scroll/wood_scrollbar_grabber.png" id="6_wood_scrollbar_grabber"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
+texture = ExtResource("2_wood_btn_normal")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
+texture = ExtResource("3_wood_btn_pressed")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
+texture = ExtResource("4_wood_panel")
+
+[sub_resource type="Theme" id="Theme_level_select"]
+Button/styles/normal = SubResource("StyleBoxButtonNormal")
+Button/styles/pressed = SubResource("StyleBoxButtonPressed")
 
 [node name="LevelSelect" type="Control"]
 layout_mode = 3
@@ -20,17 +38,32 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
-[node name="TitleLabel" type="Label" parent="."]
+[node name="Panel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -200.0
-offset_top = 40.0
-offset_right = 200.0
-offset_bottom = 100.0
+offset_left = -650.0
+offset_top = 30.0
+offset_right = 650.0
+offset_bottom = 130.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 56
+theme_override_styles/panel = SubResource("StyleBoxPanel")
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
 text = "SELECT LEVEL"
 horizontal_alignment = 1
 
@@ -42,9 +75,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -600.0
-offset_top = -350.0
+offset_top = -320.0
 offset_right = 600.0
-offset_bottom = 350.0
+offset_bottom = 320.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -65,5 +98,8 @@ offset_top = -80.0
 offset_right = 180.0
 offset_bottom = -20.0
 grow_vertical = 0
-theme_override_font_sizes/font_size = 28
+theme = SubResource("Theme_level_select")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "BACK"

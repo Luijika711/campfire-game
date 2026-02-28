@@ -1,6 +1,42 @@
-[gd_scene load_steps=2 format=3 uid="uid://settings_menu"]
+[gd_scene load_steps=22 format=3 uid="uid://settings_menu"]
 
 [ext_resource type="Script" path="res://scripts/settings_menu.gd" id="1_settings_menu"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_normal.png" id="2_wood_btn_normal"]
+[ext_resource type="Texture2D" path="res://assets/ui/buttons/wood_button_pressed.png" id="3_wood_btn_pressed"]
+[ext_resource type="Texture2D" path="res://assets/ui/panels/wood_panel.png" id="4_wood_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/checkboxes/wood_checkbox_checked.png" id="5_wood_checkbox_checked"]
+[ext_resource type="Texture2D" path="res://assets/ui/checkboxes/wood_checkbox_unchecked.png" id="6_wood_checkbox_unchecked"]
+[ext_resource type="Texture2D" path="res://assets/ui/scroll/wood_scrollbar.png" id="7_wood_scrollbar"]
+[ext_resource type="Texture2D" path="res://assets/ui/scroll/wood_scrollbar_grabber.png" id="8_wood_scrollbar_grabber"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
+texture = ExtResource("2_wood_btn_normal")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
+texture = ExtResource("3_wood_btn_pressed")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
+texture = ExtResource("4_wood_panel")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxCheckboxChecked"]
+texture = ExtResource("5_wood_checkbox_checked")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxCheckboxUnchecked"]
+texture = ExtResource("6_wood_checkbox_unchecked")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxSliderBackground"]
+texture = ExtResource("7_wood_scrollbar")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxSliderGrabber"]
+texture = ExtResource("8_wood_scrollbar_grabber")
+
+[sub_resource type="Theme" id="Theme_settings_menu"]
+Button/styles/normal = SubResource("StyleBoxButtonNormal")
+Button/styles/pressed = SubResource("StyleBoxButtonPressed")
+CheckBox/icons/checked = ExtResource("5_wood_checkbox_checked")
+CheckBox/icons/unchecked = ExtResource("6_wood_checkbox_unchecked")
+HSlider/styles/grabber_area = SubResource("StyleBoxSliderGrabber")
+HSlider/styles/slider = SubResource("StyleBoxSliderBackground")
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -20,111 +56,150 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Panel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -350.0
-offset_top = -400.0
-offset_right = 350.0
-offset_bottom = 400.0
+offset_left = -380.0
+offset_top = -420.0
+offset_right = 380.0
+offset_bottom = 420.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
+theme_override_styles/panel = SubResource("StyleBoxPanel")
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 35.0
+offset_top = 35.0
+offset_right = -35.0
+offset_bottom = -35.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 56
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
 text = "SETTINGS"
 horizontal_alignment = 1
 
-[node name="AudioSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="AudioSection" type="VBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
-[node name="SectionLabel" type="Label" parent="VBoxContainer/AudioSection"]
+[node name="SectionLabel" type="Label" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
 text = "AUDIO"
 
-[node name="MasterLabel" type="Label" parent="VBoxContainer/AudioSection"]
+[node name="MasterLabel" type="Label" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "Master Volume"
 
-[node name="MasterSlider" type="HSlider" parent="VBoxContainer/AudioSection"]
+[node name="MasterSlider" type="HSlider" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
+theme = SubResource("Theme_settings_menu")
 max_value = 100.0
 value = 100.0
 
-[node name="MusicLabel" type="Label" parent="VBoxContainer/AudioSection"]
+[node name="MusicLabel" type="Label" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "Music Volume"
 
-[node name="MusicSlider" type="HSlider" parent="VBoxContainer/AudioSection"]
+[node name="MusicSlider" type="HSlider" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
+theme = SubResource("Theme_settings_menu")
 max_value = 100.0
 value = 80.0
 
-[node name="SFXLabel" type="Label" parent="VBoxContainer/AudioSection"]
+[node name="SFXLabel" type="Label" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "SFX Volume"
 
-[node name="SFXSlider" type="HSlider" parent="VBoxContainer/AudioSection"]
+[node name="SFXSlider" type="HSlider" parent="Panel/VBoxContainer/AudioSection"]
 layout_mode = 2
+theme = SubResource("Theme_settings_menu")
 max_value = 100.0
 value = 100.0
 
-[node name="GraphicsSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="GraphicsSection" type="VBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
-[node name="SectionLabel2" type="Label" parent="VBoxContainer/GraphicsSection"]
+[node name="SectionLabel2" type="Label" parent="Panel/VBoxContainer/GraphicsSection"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
 text = "GRAPHICS"
 
-[node name="FullscreenCheck" type="CheckBox" parent="VBoxContainer/GraphicsSection"]
+[node name="FullscreenCheck" type="CheckBox" parent="Panel/VBoxContainer/GraphicsSection"]
 layout_mode = 2
+theme = SubResource("Theme_settings_menu")
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "Fullscreen"
 
-[node name="VSyncCheck" type="CheckBox" parent="VBoxContainer/GraphicsSection"]
+[node name="VSyncCheck" type="CheckBox" parent="Panel/VBoxContainer/GraphicsSection"]
 layout_mode = 2
+theme = SubResource("Theme_settings_menu")
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "VSync"
 
-[node name="ShowFPSCheck" type="CheckBox" parent="VBoxContainer/GraphicsSection"]
+[node name="ShowFPSCheck" type="CheckBox" parent="Panel/VBoxContainer/GraphicsSection"]
 layout_mode = 2
+theme = SubResource("Theme_settings_menu")
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "Show FPS"
 
-[node name="GameSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="GameSection" type="VBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
-[node name="SectionLabel3" type="Label" parent="VBoxContainer/GameSection"]
+[node name="SectionLabel3" type="Label" parent="Panel/VBoxContainer/GameSection"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
 text = "GAME"
 
-[node name="PlayerNameLabel" type="Label" parent="VBoxContainer/GameSection"]
+[node name="PlayerNameLabel" type="Label" parent="Panel/VBoxContainer/GameSection"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 text = "Player Name"
 
-[node name="PlayerNameInput" type="LineEdit" parent="VBoxContainer/GameSection"]
+[node name="PlayerNameInput" type="LineEdit" parent="Panel/VBoxContainer/GameSection"]
 layout_mode = 2
 text = "Player"
 
-[node name="Spacer" type="Control" parent="VBoxContainer"]
+[node name="Spacer" type="Control" parent="Panel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SaveButton" type="Button" parent="VBoxContainer"]
+[node name="SaveButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme = SubResource("Theme_settings_menu")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "SAVE SETTINGS"
 
-[node name="BackButton" type="Button" parent="VBoxContainer"]
+[node name="BackButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme = SubResource("Theme_settings_menu")
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "BACK"

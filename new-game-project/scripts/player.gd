@@ -111,6 +111,20 @@ func _input(event: InputEvent) -> void:
 func _handle_keyboard_input(event: InputEvent) -> void:
 	if not (event is InputEventKey or event is InputEventMouseButton):
 		return
+
+	# Keyboard weapon switching (number keys + scroll wheel)
+	if weapon_manager:
+		if event.is_action_pressed("weapon_1"):
+			weapon_manager._equip_weapon(0)
+		elif event.is_action_pressed("weapon_2"):
+			weapon_manager._equip_weapon(1)
+		elif event.is_action_pressed("weapon_3"):
+			weapon_manager._equip_weapon(2)
+		elif event.is_action_pressed("weapon_next"):
+			weapon_manager._switch_weapon(1)
+		elif event.is_action_pressed("weapon_prev"):
+			weapon_manager._switch_weapon(-1)
+
 	for action in ["move_left", "move_right", "jump", "shoot", "move_down"]:
 		if event.is_action(action):
 			var pressed = event.is_pressed()

@@ -24,12 +24,23 @@ func _process(delta: float) -> void:
 	if _host_player == null:
 		return
 
-	var all_positions: Array[Vector2] = [_host_player.global_position]
+	var all_positions: Array[Vector2] = []
+	if not _host_player.is_dead:
+		all_positions.append(_host_player.global_position)
 
 	if _player_manager:
-		for p in _player_manager.get_all_players():
-			if p is Node2D:
-				all_positions.append(p.global_position)
+		var all_players = _player_manager.get_all_players()
+		if all_players is Dictionary:
+			for p in all_players.values():
+				if p is Node2D and not p.is_dead:
+					all_positions.append(p.global_position)
+		else:
+			for p in all_players:
+				if p is Node2D:
+					all_positions.append(p.global_position)
+
+	if all_positions.size() == 0:
+		return
 
 	if all_positions.size() == 1:
 		# Single player — just follow them

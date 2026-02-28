@@ -23,20 +23,10 @@ func _ready() -> void:
 	# Equip first available weapon
 	_equip_weapon(0)
 
-func _input(event: InputEvent) -> void:
-	# Weapon switching with number keys
-	if event.is_action_pressed("weapon_1"):
-		_equip_weapon(0)
-	elif event.is_action_pressed("weapon_2"):
-		_equip_weapon(1)
-	elif event.is_action_pressed("weapon_3"):
-		_equip_weapon(2)
-
-	# Mouse wheel weapon switching
-	if event.is_action_pressed("weapon_next"):
-		_switch_weapon(1)
-	elif event.is_action_pressed("weapon_prev"):
-		_switch_weapon(-1)
+func _input(_event: InputEvent) -> void:
+	# Weapon switching is handled by the player script per-device
+	# to avoid shared input between multiple players
+	pass
 
 func _process(_delta: float) -> void:
 	# Update ammo displays

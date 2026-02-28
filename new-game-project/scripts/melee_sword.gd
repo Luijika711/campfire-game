@@ -9,7 +9,6 @@ extends Weapon
 @onready var hitbox: Area2D
 @onready var sword_visual: Polygon2D
 
-var held_icon: Polygon2D
 var is_swinging: bool = false
 
 func _ready() -> void:
@@ -18,18 +17,6 @@ func _ready() -> void:
 	weapon_type = WeaponType.MELEE_SWORD
 	damage = 30
 	cooldown = 0.4
-
-	# Create held weapon icon (always visible when equipped)
-	held_icon = Polygon2D.new()
-	held_icon.name = "HeldIcon"
-	held_icon.polygon = PackedVector2Array([
-		Vector2(8, -2), Vector2(30, -3),
-		Vector2(32, 0), Vector2(30, 3),
-		Vector2(8, 2), Vector2(6, 0),
-	])
-	held_icon.color = Color(0.75, 0.75, 0.85, 0.9)
-	held_icon.position = Vector2(0, -4)
-	add_child(held_icon)
 
 	# Create hitbox
 	hitbox = Area2D.new()

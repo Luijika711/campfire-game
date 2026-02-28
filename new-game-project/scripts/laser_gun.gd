@@ -9,7 +9,6 @@ extends Weapon
 
 var current_ammo: int
 var is_firing: bool = false
-var held_icon: Polygon2D
 
 @onready var laser_beam: Line2D
 @onready var glow_beam: Line2D
@@ -20,19 +19,6 @@ func _ready() -> void:
 	weapon_name = "Laser Gun"
 	weapon_type = WeaponType.LASER_GUN
 	current_ammo = max_ammo
-
-	# Create held weapon icon (always visible when equipped)
-	held_icon = Polygon2D.new()
-	held_icon.name = "HeldIcon"
-	held_icon.polygon = PackedVector2Array([
-		Vector2(6, -4), Vector2(28, -2),
-		Vector2(32, 0), Vector2(28, 2),
-		Vector2(6, 4), Vector2(4, 2),
-		Vector2(4, -2),
-	])
-	held_icon.color = Color(0.3, 0.7, 0.8, 0.9)
-	held_icon.position = Vector2(0, -4)
-	add_child(held_icon)
 
 	# Create laser beam
 	laser_beam = Line2D.new()

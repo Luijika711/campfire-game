@@ -1,13 +1,8 @@
 extends Node2D
 
-@export var current_map_id: String = "basic"
+const LEVELS_DIR := "res://scenes/levels/"
 
-# Level scene paths mapped by map_id
-var level_scenes: Dictionary = {
-	"basic": "res://scenes/levels/level_basic.tscn",
-	"tower": "res://scenes/levels/level_tower.tscn",
-	"sky_islands": "res://scenes/levels/level_sky_islands.tscn",
-}
+@export var current_map_id: String = "basic"
 
 @onready var coin_label: Label = $CanvasLayer/UI/CoinLabel
 @onready var player_count_label: Label = $CanvasLayer/UI/PlayerCountLabel
@@ -77,14 +72,15 @@ func _load_map(map_id: String) -> void:
 	for child in level_container.get_children():
 		child.queue_free()
 
-	# Load the level scene
-	if not level_scenes.has(map_id):
-		push_error("No level scene for map: %s" % map_id)
+	# Auto-discover level scene from folder
+	var scene_path := LEVELS_DIR + map_id + "/level.tscn"
+	if not ResourceLoader.exists(scene_path):
+		push_error("Level not found: %s" % scene_path)
 		return
 
-	var scene = load(level_scenes[map_id])
+	var scene = load(scene_path)
 	if scene == null:
-		push_error("Failed to load level scene: %s" % level_scenes[map_id])
+		push_error("Failed to load level scene: %s" % scene_path)
 		return
 
 	var level = scene.instantiate()

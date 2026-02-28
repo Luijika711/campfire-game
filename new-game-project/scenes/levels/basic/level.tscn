@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Texture2D" uid="uid://t1yxljrhlv0q" path="res://assets/wallpaper-sky-lvl1.jpeg" id="1_bg"]
 [ext_resource type="Texture2D" path="res://assets/tile_atlas.png" id="2_atlas"]
+[ext_resource type="Script" path="res://scripts/level_base.gd" id="3_script"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_basic"]
 texture = ExtResource("2_atlas")
@@ -18,6 +19,9 @@ physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_basic")
 
 [node name="LevelBasic" type="Node2D"]
+script = ExtResource("3_script")
+level_name = "Basic Platformer"
+description = "A simple map with platforms and coins"
 
 [node name="Background" type="Sprite2D" parent="."]
 z_index = -10

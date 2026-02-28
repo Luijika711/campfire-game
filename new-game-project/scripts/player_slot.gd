@@ -30,9 +30,7 @@ func setup(player_data: PartyManager.PlayerData):
 
 func update_color(new_color: Color):
 	current_color = new_color
-	color_preview.modulate = new_color
-
-	# Create a new gradient texture with the color
+	# Create a solid color texture for the preview
 	var gradient = Gradient.new()
 	gradient.colors = PackedColorArray([new_color, new_color])
 	var texture = GradientTexture2D.new()
@@ -40,6 +38,7 @@ func update_color(new_color: Color):
 	texture.width = 40
 	texture.height = 40
 	color_preview.texture = texture
+	color_preview.modulate = Color.WHITE
 
 func update_ready(is_ready: bool):
 	ready_check_box.button_pressed = is_ready

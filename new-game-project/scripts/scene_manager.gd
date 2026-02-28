@@ -46,5 +46,7 @@ func quit_game() -> void:
 	get_tree().quit()
 
 func restart_current_level() -> void:
+	if not is_instance_valid(current_scene):
+		return
 	var current_path = current_scene.scene_file_path
 	change_scene(current_path)

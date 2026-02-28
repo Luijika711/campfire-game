@@ -11,24 +11,52 @@
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
 texture = ExtResource("2_wood_btn_normal")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
 texture = ExtResource("3_wood_btn_pressed")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
 texture = ExtResource("4_wood_panel")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxCheckboxChecked"]
 texture = ExtResource("5_wood_checkbox_checked")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxCheckboxUnchecked"]
 texture = ExtResource("6_wood_checkbox_unchecked")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxSliderBackground"]
 texture = ExtResource("7_wood_scrollbar")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxSliderGrabber"]
 texture = ExtResource("8_wood_scrollbar_grabber")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
 
 [sub_resource type="Theme" id="Theme_settings_menu"]
 Button/styles/normal = SubResource("StyleBoxButtonNormal")

@@ -15,7 +15,7 @@ func _ready() -> void:
 	super._ready()
 	weapon_name = "Melee Sword"
 	weapon_type = WeaponType.MELEE_SWORD
-	damage = 25
+	damage = 30
 	cooldown = 0.4
 
 	# Create hitbox
@@ -23,6 +23,7 @@ func _ready() -> void:
 	hitbox.name = "SwordHitbox"
 	hitbox.collision_layer = 0
 	hitbox.collision_mask = 6 | 1  # Hit enemies, platforms, and players
+	hitbox.monitoring = false
 	add_child(hitbox)
 
 	var collision_shape = CollisionShape2D.new()

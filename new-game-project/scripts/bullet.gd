@@ -11,13 +11,13 @@ var shooter_team: int = 0  # TeamManager.Team.NONE
 @onready var sprite: Sprite2D = $Sprite2D
 
 func _ready() -> void:
+	# Connect collision signals first
+	body_entered.connect(_on_body_entered)
+	area_entered.connect(_on_area_entered)
+
 	# Auto-destroy after lifetime
 	await get_tree().create_timer(lifetime).timeout
 	queue_free()
-
-	# Connect collision signal
-	body_entered.connect(_on_body_entered)
-	area_entered.connect(_on_area_entered)
 
 func _physics_process(delta: float) -> void:
 	position += direction * speed * delta

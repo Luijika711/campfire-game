@@ -29,14 +29,14 @@ var weapon_switch_pressed: int = -1  # -1 = no switch, 0-2 = weapon index
 
 # Color mapping
 const COLOR_MAP = {
-	"Red": Color(1.0, 0.27, 0.27),
-	"Blue": Color(0.27, 0.27, 1.0),
-	"Green": Color(0.27, 1.0, 0.27),
-	"Yellow": Color(1.0, 1.0, 0.27),
-	"Purple": Color(1.0, 0.27, 1.0),
-	"Orange": Color(1.0, 0.53, 0.27),
-	"Cyan": Color(0.27, 1.0, 1.0),
-	"Pink": Color(1.0, 0.53, 0.67),
+	"Red": Color(0.85, 0.35, 0.35),
+	"Blue": Color(0.35, 0.5, 0.85),
+	"Green": Color(0.35, 0.8, 0.35),
+	"Yellow": Color(0.85, 0.85, 0.35),
+	"Purple": Color(0.8, 0.4, 0.85),
+	"Orange": Color(0.85, 0.6, 0.35),
+	"Cyan": Color(0.35, 0.8, 0.8),
+	"Pink": Color(0.85, 0.55, 0.65),
 }
 
 func setup_player(id: int, p_name: String, color: String, p_team: int = 0):

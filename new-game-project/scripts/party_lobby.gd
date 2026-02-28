@@ -2,10 +2,10 @@ extends Control
 
 const PLAYER_SLOT_SCENE = preload("res://scenes/player_slot.tscn")
 
-@onready var players_container: VBoxContainer = $Panel/VBoxContainer/PlayersContainer
-@onready var instructions_label: Label = $Panel/VBoxContainer/InstructionsLabel
-@onready var start_button: Button = $Panel/VBoxContainer/StartButton
-@onready var back_button: Button = $Panel/VBoxContainer/BackButton
+@onready var players_container: VBoxContainer = $MainPanel/ContentHBox/LeftSide/PlayersContainer
+@onready var instructions_label: Label = $MainPanel/ContentHBox/LeftSide/InstructionsLabel
+@onready var start_button: Button = $MainPanel/ContentHBox/LeftSide/StartButton
+@onready var back_button: Button = $MainPanel/ContentHBox/LeftSide/BackButton
 
 var player_slots: Dictionary = {}  # player_id -> PlayerSlot node
 
@@ -110,6 +110,8 @@ func _input(event):
 
 func _on_player_joined(player_data: PartyManager.PlayerData):
 	_create_player_slot(player_data)
+	# Auto-ready players when they join
+	PartyManager.set_player_ready(player_data.player_id, true)
 	_update_start_button()
 	_update_instructions()
 

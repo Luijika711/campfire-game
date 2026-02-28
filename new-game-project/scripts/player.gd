@@ -43,6 +43,7 @@ var last_aim_direction: Vector2 = Vector2.RIGHT
 var is_dead: bool = false
 var is_attacking: bool = false
 var facing_direction: String = "right"
+var base_color: Color = Color(1, 1, 1, 1)
 
 # Device-specific input
 var input_device: String = "keyboard"
@@ -88,6 +89,9 @@ func _ready() -> void:
 	# Initialize device-specific input
 	input_device = get_meta("input_device", "keyboard")
 	device_id = get_meta("device_id", -1)
+
+	# Store base color from visual (may be set externally before _ready)
+	base_color = visual.modulate
 
 	# Create aim indicator
 	_create_aim_indicator()
@@ -369,7 +373,7 @@ func _trigger_dash(direction: int) -> void:
 		dash_trail.restart()
 		dash_trail.emitting = true
 	await get_tree().create_timer(dash_duration).timeout
-	visual.modulate = Color(1, 1, 1, 1)
+	visual.modulate = base_color
 	if dash_trail:
 		dash_trail.emitting = false
 
@@ -435,7 +439,7 @@ func take_damage(amount: int, source: Node = null) -> void:
 	visual.modulate = Color(1, 0, 0, 1)
 	await get_tree().create_timer(0.1).timeout
 	if not is_dead:
-		visual.modulate = Color(1, 1, 1, 1)
+		visual.modulate = base_color
 
 func die() -> void:
 	if is_dead:

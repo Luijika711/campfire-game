@@ -1,18 +1,31 @@
-[gd_scene load_steps=6 format=3 uid="uid://party_lobby"]
+[gd_scene load_steps=7 format=3 uid="uid://party_lobby"]
 
 [ext_resource type="Script" path="res://scripts/party_lobby.gd" id="1_lobby"]
 [ext_resource type="Texture2D" uid="uid://c2cv5o83fngbo" path="res://assets/ui/panels/wood_panel.png" id="2_panel"]
 [ext_resource type="Texture2D" uid="uid://crm2q2x5a6kw3" path="res://assets/ui/buttons/wood_button_normal.png" id="3_btn_normal"]
 [ext_resource type="Texture2D" uid="uid://d30ek8qep43cx" path="res://assets/ui/buttons/wood_button_pressed.png" id="4_btn_pressed"]
+[ext_resource type="PackedScene" uid="uid://qr_display" path="res://scenes/qr_display.tscn" id="5_qr_display"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
 texture = ExtResource("2_panel")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
 texture = ExtResource("3_btn_normal")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
 texture = ExtResource("4_btn_pressed")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
 
 [sub_resource type="Theme" id="Theme_lobby"]
 Button/styles/normal = SubResource("StyleBoxButtonNormal")
@@ -36,37 +49,31 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
-[node name="Panel" type="Panel" parent="."]
+[node name="MainPanel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -300.0
-offset_right = 400.0
-offset_bottom = 300.0
+offset_left = -550.0
+offset_top = -340.0
+offset_right = 550.0
+offset_bottom = 340.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxPanel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+[node name="TitleLabel" type="Label" parent="MainPanel"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 30.0
-offset_top = 30.0
-offset_right = -30.0
-offset_bottom = -30.0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = -20.0
+offset_bottom = 65.0
 grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 20
-
-[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 42
 theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
 theme_override_constants/shadow_offset_x = 2
@@ -74,39 +81,84 @@ theme_override_constants/shadow_offset_y = 2
 text = "PARTY LOBBY"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="Panel/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Join with Keyboard, Mouse, Controller, or Phone!"
-horizontal_alignment = 1
+[node name="ContentHBox" type="HBoxContainer" parent="MainPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 75.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
 
-[node name="PlayersContainer" type="VBoxContainer" parent="Panel/VBoxContainer"]
+[node name="LeftSide" type="VBoxContainer" parent="MainPanel/ContentHBox"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 10
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.2
+theme_override_constants/separation = 12
 
-[node name="InstructionsLabel" type="Label" parent="Panel/VBoxContainer"]
+[node name="SubtitleLabel" type="Label" parent="MainPanel/ContentHBox/LeftSide"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-text = "Press ENTER (Keyboard) or A Button (Gamepad) to Join!"
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Press ENTER / A Button to Join"
 horizontal_alignment = 1
 
-[node name="StartButton" type="Button" parent="Panel/VBoxContainer"]
+[node name="PlayersContainer" type="VBoxContainer" parent="MainPanel/ContentHBox/LeftSide"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="InstructionsLabel" type="Label" parent="MainPanel/ContentHBox/LeftSide"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Shoulder Buttons = Color | X = Ready"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="MainPanel/ContentHBox/LeftSide"]
 layout_mode = 2
 theme = SubResource("Theme_lobby")
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 26
 theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
 theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 theme_override_colors/font_disabled_color = Color(0.4, 0.4, 0.4, 1)
 disabled = true
 text = "WAITING FOR PLAYERS..."
 
-[node name="BackButton" type="Button" parent="Panel/VBoxContainer"]
+[node name="BackButton" type="Button" parent="MainPanel/ContentHBox/LeftSide"]
 layout_mode = 2
 theme = SubResource("Theme_lobby")
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
 theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
 text = "Back to Menu"
+
+[node name="Separator" type="VSeparator" parent="MainPanel/ContentHBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+theme_override_colors/separator_color = Color(0.4, 0.35, 0.25, 0.5)
+
+[node name="RightSide" type="VBoxContainer" parent="MainPanel/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="PhoneLabel" type="Label" parent="MainPanel/ContentHBox/RightSide"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+text = "Join with Phone"
+horizontal_alignment = 1
+
+[node name="QRContainer" type="CenterContainer" parent="MainPanel/ContentHBox/RightSide"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="QRDisplay" parent="MainPanel/ContentHBox/RightSide/QRContainer" instance=ExtResource("5_qr_display")]
+layout_mode = 2
+custom_minimum_size = Vector2(380, 420)

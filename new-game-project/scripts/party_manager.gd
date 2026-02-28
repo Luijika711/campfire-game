@@ -26,14 +26,14 @@ signal all_players_ready
 # Constants
 const MAX_PLAYERS = 8
 const DEFAULT_COLORS = [
-	Color(1.0, 0.2, 0.2, 1.0),    # Red
-	Color(0.2, 0.4, 1.0, 1.0),    # Blue
-	Color(0.2, 1.0, 0.2, 1.0),    # Green
-	Color(1.0, 1.0, 0.2, 1.0),    # Yellow
-	Color(1.0, 0.2, 1.0, 1.0),    # Magenta
-	Color(0.2, 1.0, 1.0, 1.0),    # Cyan
-	Color(1.0, 0.6, 0.2, 1.0),    # Orange
-	Color(0.8, 0.2, 1.0, 1.0),    # Purple
+	Color(0.85, 0.35, 0.35, 1.0),   # Red
+	Color(0.35, 0.5, 0.85, 1.0),    # Blue
+	Color(0.35, 0.8, 0.35, 1.0),    # Green
+	Color(0.85, 0.85, 0.35, 1.0),   # Yellow
+	Color(0.8, 0.4, 0.85, 1.0),     # Magenta
+	Color(0.35, 0.8, 0.8, 1.0),     # Cyan
+	Color(0.85, 0.6, 0.35, 1.0),    # Orange
+	Color(0.65, 0.35, 0.85, 1.0),   # Purple
 ]
 
 # State

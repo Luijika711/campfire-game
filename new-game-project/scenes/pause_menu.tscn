@@ -7,9 +7,17 @@
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxButtonNormal"]
 texture = ExtResource("2_wood_btn_normal")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxButtonPressed"]
 texture = ExtResource("3_wood_btn_pressed")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
 
 [sub_resource type="Theme" id="Theme_pause_menu"]
 Button/styles/normal = SubResource("StyleBoxButtonNormal")
@@ -17,6 +25,10 @@ Button/styles/pressed = SubResource("StyleBoxButtonPressed")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxPanel"]
 texture = ExtResource("4_wood_panel")
+texture_margin_left = 10.0
+texture_margin_top = 10.0
+texture_margin_right = 10.0
+texture_margin_bottom = 10.0
 
 [node name="PauseMenu" type="Control"]
 process_mode = 3

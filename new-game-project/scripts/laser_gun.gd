@@ -18,7 +18,7 @@ func _ready() -> void:
 	super._ready()
 	weapon_name = "Laser Gun"
 	weapon_type = WeaponType.LASER_GUN
-	damage = 25
+	damage = 50
 	cooldown = 0.15  # Fast firing
 	current_ammo = max_ammo
 
@@ -105,12 +105,14 @@ func _fire_laser(direction: Vector2) -> void:
 			var collider = result.collider
 			hit_pos = result.position
 
+			# Exclude this collider from future raycasts to avoid multi-hit
+			query.exclude.append(collider.get_rid())
+
 			if collider != player and collider.is_in_group("enemies"):
 				# Deal damage to enemy AI
 				if collider.has_method("take_damage"):
 					collider.take_damage(damage, player)
 				_show_hit_at(hit_pos)
-				current_start = hit_pos + direction * 5
 				hits += 1
 			elif collider != player and collider.is_in_group("players"):
 				# Team-aware player damage
@@ -118,12 +120,8 @@ func _fire_laser(direction: Vector2) -> void:
 					if collider.has_method("take_damage"):
 						collider.take_damage(damage, player)
 					_show_hit_at(hit_pos)
-				# Continue past player regardless
-				current_start = hit_pos + direction * 5
 				hits += 1
 			else:
-				# Not an enemy or player, ignore and continue
-				current_start = hit_pos + direction * 5
 				hits += 1
 		else:
 			break

@@ -17,7 +17,7 @@ func _ready() -> void:
 	super._ready()
 	weapon_name = "Gun"
 	weapon_type = WeaponType.GUN
-	damage = 15
+	damage = 10
 	cooldown = 0.12
 	current_ammo = max_ammo
 
@@ -61,7 +61,7 @@ func perform_attack(direction: Vector2) -> void:
 		# Set bullet to damage enemies and players
 		bullet.add_to_group("player_bullets")
 		bullet.collision_layer = 8
-		bullet.collision_mask = 4 | 2 | 8 | 1  # Hit enemies, platforms, hazards, and players
+		bullet.collision_mask = 1 | 2 | 4  # Players, platforms/walls, enemies
 
 		get_tree().current_scene.add_child(bullet)
 

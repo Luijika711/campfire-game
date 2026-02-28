@@ -482,11 +482,6 @@ func heal(amount: int) -> void:
 	if health_component:
 		health_component.heal(amount)
 
-func set_team(new_team: int) -> void:
-	team = new_team
-	if TeamManager:
-		TeamManager.set_team(self, team)
-
 func _handle_weapon_attack() -> void:
 	# Get aim direction (device-aware)
 	var aim_direction = _get_aim_direction()

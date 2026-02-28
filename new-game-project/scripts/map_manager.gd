@@ -34,11 +34,12 @@ func load_map(map_id: String, target_tile_map: TileMap) -> bool:
 	# Set tileset if provided
 	if current_map.tile_set != null:
 		tile_map.tile_set = current_map.tile_set
-	
+
 	# Check if tiles already exist (placed in editor) - preserve them
 	var existing_tiles = tile_map.get_used_cells(0)
 	if existing_tiles.size() > 0:
-		print("Editor tiles detected (%d tiles), preserving them and adding map tiles on top..." % existing_tiles.size())
+		var msg = "Editor tiles (%d), preserving and adding map tiles..." % existing_tiles.size()
+		print(msg)
 	else:
 		# No editor tiles, clear and use programmatic tiles
 		tile_map.clear()
@@ -91,6 +92,9 @@ func get_spawn_point(player_index: int) -> Vector2:
 	return current_map.get_spawn_point(player_index)
 
 func _create_default_maps() -> void:
+	# Load wallpaper texture
+	var wallpaper_texture = load("res://assets/wallpaper-sky-lvl1.jpeg")
+
 	# Create tileset with textures
 	var tile_set = _create_tileset()
 
@@ -99,6 +103,7 @@ func _create_default_maps() -> void:
 	map1.map_name = "Basic Platformer"
 	map1.description = "A simple map with platforms and coins"
 	map1.tile_set = tile_set
+	map1.background_texture = wallpaper_texture
 	var spawn_points1: Array[Vector2] = [Vector2(100, 400), Vector2(150, 400), Vector2(200, 400)]
 	map1.spawn_points = spawn_points1
 	var coin_positions1: Array[Vector2] = [
@@ -135,6 +140,7 @@ func _create_default_maps() -> void:
 	map2.map_name = "Tower Climb"
 	map2.description = "Climb to the top!"
 	map2.tile_set = tile_set
+	map2.background_texture = wallpaper_texture
 	var spawn_points2: Array[Vector2] = [Vector2(100, 500)]
 	map2.spawn_points = spawn_points2
 	var coin_positions2: Array[Vector2] = [
@@ -170,6 +176,7 @@ func _create_default_maps() -> void:
 	map3.map_name = "Sky Islands"
 	map3.description = "Jump between floating islands"
 	map3.tile_set = tile_set
+	map3.background_texture = wallpaper_texture
 	var spawn_points3: Array[Vector2] = [Vector2(100, 300)]
 	map3.spawn_points = spawn_points3
 	var coin_positions3: Array[Vector2] = [

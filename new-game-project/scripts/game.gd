@@ -2,15 +2,21 @@ extends Node2D
 
 @export var current_map_id: String = "basic"
 
+# Level scene paths mapped by map_id
+var level_scenes: Dictionary = {
+	"basic": "res://scenes/levels/level_basic.tscn",
+	"tower": "res://scenes/levels/level_tower.tscn",
+	"sky_islands": "res://scenes/levels/level_sky_islands.tscn",
+}
+
 @onready var coin_label: Label = $CanvasLayer/UI/CoinLabel
 @onready var player_count_label: Label = $CanvasLayer/UI/PlayerCountLabel
 @onready var qr_display: Control = $CanvasLayer/QRDisplay
 @onready var show_qr_button: Button = $CanvasLayer/UI/ShowQRButton
-@onready var tile_map: TileMap = $TileMap
+@onready var level_container: Node2D = $LevelContainer
 @onready var coins: Node2D = $Coins
 @onready var goal: Node2D = $Goal
 @onready var host_player: CharacterBody2D = $HostPlayer
-@onready var background: Sprite2D = $BackgroundLayer/Background
 @onready var game_camera: Camera2D = $GameCamera
 @onready var health_bar: ProgressBar = $CanvasLayer/UI/HealthBar
 @onready var health_label: Label = $CanvasLayer/UI/HealthLabel
@@ -67,35 +73,61 @@ func _ready() -> void:
 	print("Game started! Press 'Show QR Code' to let players join.")
 
 func _load_map(map_id: String) -> void:
-	# Load map using MapManager
-	if MapManager.load_map(map_id, tile_map):
-		var map_data = MapManager.get_current_map()
+	# Clear any previous level
+	for child in level_container.get_children():
+		child.queue_free()
 
-		# Update background texture if provided
-		if map_data.background_texture != null:
-			background.texture = map_data.background_texture
-		else:
-			# Fallback to default wallpaper
-			background.texture = load("res://assets/wallpaper-sky-lvl1.jpeg")
+	# Load the level scene
+	if not level_scenes.has(map_id):
+		push_error("No level scene for map: %s" % map_id)
+		return
 
-		# Position host player at first spawn point
-		if host_player != null:
-			host_player.position = map_data.get_spawn_point(0)
+	var scene = load(level_scenes[map_id])
+	if scene == null:
+		push_error("Failed to load level scene: %s" % level_scenes[map_id])
+		return
 
-		# Spawn coins
-		_spawn_coins(map_data.coin_positions)
+	var level = scene.instantiate()
+	level_container.add_child(level)
 
-		# Position goal
-		if goal != null:
-			goal.position = map_data.goal_position
+	# Read spawn points from Marker2D nodes
+	var spawn_points: Array[Vector2] = []
+	var spawn_container = level.get_node_or_null("SpawnPoints")
+	if spawn_container:
+		for marker in spawn_container.get_children():
+			if marker is Marker2D:
+				spawn_points.append(marker.position)
 
-		# Setup player manager spawn points
-		if $PlayerManager:
-			$PlayerManager.spawn_points = map_data.spawn_points
+	# Read coin positions from Marker2D nodes
+	var coin_positions: Array[Vector2] = []
+	var coin_container = level.get_node_or_null("CoinPositions")
+	if coin_container:
+		for marker in coin_container.get_children():
+			if marker is Marker2D:
+				coin_positions.append(marker.position)
 
-		print("Map loaded: %s" % map_data.map_name)
-	else:
-		push_error("Failed to load map: %s" % map_id)
+	# Read goal position
+	var goal_marker = level.get_node_or_null("GoalPosition")
+	var goal_pos := Vector2(1050, 186)
+	if goal_marker is Marker2D:
+		goal_pos = goal_marker.position
+
+	# Position host player at first spawn point
+	if host_player != null and spawn_points.size() > 0:
+		host_player.position = spawn_points[0]
+
+	# Spawn coins
+	_spawn_coins(coin_positions)
+
+	# Position goal
+	if goal != null:
+		goal.position = goal_pos
+
+	# Setup player manager spawn points
+	if $PlayerManager and spawn_points.size() > 0:
+		$PlayerManager.spawn_points = spawn_points
+
+	print("Level loaded: %s" % map_id)
 
 func _spawn_coins(positions: Array[Vector2]) -> void:
 	# Clear existing coins

@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://t1yxljrhlv0q" path="res://assets/wallpaper-sky-lvl1.jpeg" id="1_bg"]
+
+[sub_resource type="TileSet" id="TileSet_basic"]
+tile_size = Vector2i(32, 32)
+
+[node name="LevelBasic" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(960, 540)
+texture = ExtResource("1_bg")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_basic")
+format = 2
+layer_0/name = "Ground"
+layer_0/tile_data = PackedInt32Array(1245174, 0, 0, 1245175, 0, 0, 1245176, 0, 0, 1245177, 0, 0, 1245178, 0, 0, 1245179, 0, 0, 1245180, 0, 0, 1245181, 0, 0, 1245182, 0, 0, 1245183, 0, 0, 1179648, 0, 0, 1179649, 0, 0, 1179650, 0, 0, 1179651, 0, 0, 1179652, 0, 0, 1179653, 0, 0, 1179654, 0, 0, 1179655, 0, 0, 1179656, 0, 0, 1179657, 0, 0, 1179658, 0, 0, 1179659, 0, 0, 1179660, 0, 0, 1179661, 0, 0, 1179662, 0, 0, 1179663, 0, 0, 1179664, 0, 0, 1179665, 0, 0, 1179666, 0, 0, 1179667, 0, 0, 1179668, 0, 0, 1179669, 0, 0, 1179670, 0, 0, 1179671, 0, 0, 1179672, 0, 0, 1179673, 0, 0, 1179674, 0, 0, 1179675, 0, 0, 1179676, 0, 0, 1179677, 0, 0, 1179678, 0, 0, 1179679, 0, 0, 1179680, 0, 0, 1179681, 0, 0, 1179682, 0, 0, 1179683, 0, 0, 1179684, 0, 0, 1179685, 0, 0, 1179686, 0, 0, 1179687, 0, 0, 786442, 0, 1, 786443, 0, 1, 786444, 0, 1, 786445, 0, 1, 786446, 0, 1, 589846, 0, 1, 589847, 0, 1, 589848, 0, 1, 589849, 0, 1, 589850, 0, 1, 589851, 0, 1, 524323, 0, 1, 524324, 0, 1, 524325, 0, 1, 524326, 0, 1, 524327, 0, 1)
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="Spawn0" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(100, 400)
+
+[node name="Spawn1" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(150, 400)
+
+[node name="Spawn2" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(200, 400)
+
+[node name="CoinPositions" type="Node2D" parent="."]
+
+[node name="Coin0" type="Marker2D" parent="CoinPositions"]
+position = Vector2(300, 400)
+
+[node name="Coin1" type="Marker2D" parent="CoinPositions"]
+position = Vector2(600, 300)
+
+[node name="Coin2" type="Marker2D" parent="CoinPositions"]
+position = Vector2(900, 200)
+
+[node name="Coin3" type="Marker2D" parent="CoinPositions"]
+position = Vector2(500, 550)
+
+[node name="Coin4" type="Marker2D" parent="CoinPositions"]
+position = Vector2(800, 550)
+
+[node name="GoalPosition" type="Marker2D" parent="."]
+position = Vector2(1050, 186)

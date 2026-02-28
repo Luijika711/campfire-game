@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://t1yxljrhlv0q" path="res://assets/wallpaper-sky-lvl1.jpeg" id="1_bg"]
+
+[sub_resource type="TileSet" id="TileSet_tower"]
+tile_size = Vector2i(32, 32)
+
+[node name="LevelTower" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(960, 540)
+texture = ExtResource("1_bg")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_tower")
+format = 2
+layer_0/name = "Ground"
+layer_0/tile_data = PackedInt32Array(1376251, 0, 0, 1376252, 0, 0, 1376253, 0, 0, 1376254, 0, 0, 1376255, 0, 0, 1310720, 0, 0, 1310721, 0, 0, 1310722, 0, 0, 1310723, 0, 0, 1310724, 0, 0, 1310725, 0, 0, 1310726, 0, 0, 1310727, 0, 0, 1310728, 0, 0, 1310729, 0, 0, 1310730, 0, 0, 1310731, 0, 0, 1310732, 0, 0, 1310733, 0, 0, 1310734, 0, 0, 1179658, 0, 1, 1179659, 0, 1, 1179660, 0, 1, 1048590, 0, 1, 1048591, 0, 1, 1048592, 0, 1, 917522, 0, 1, 917523, 0, 1, 917524, 0, 1, 786454, 0, 1, 786455, 0, 1, 786456, 0, 1, 655386, 0, 1, 655387, 0, 1, 655388, 0, 1, 524318, 0, 1, 524319, 0, 1, 524320, 0, 1, 393250, 0, 1, 393251, 0, 1, 393252, 0, 1, 262182, 0, 1, 262183, 0, 1, 262184, 0, 1, 131112, 0, 0, 131113, 0, 0, 131114, 0, 0, 131115, 0, 0, 131116, 0, 0, 131117, 0, 0, 131118, 0, 0, 131119, 0, 0, 131120, 0, 0, 131121, 0, 0)
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="Spawn0" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(100, 500)
+
+[node name="CoinPositions" type="Node2D" parent="."]
+
+[node name="Coin0" type="Marker2D" parent="CoinPositions"]
+position = Vector2(200, 450)
+
+[node name="Coin1" type="Marker2D" parent="CoinPositions"]
+position = Vector2(400, 350)
+
+[node name="Coin2" type="Marker2D" parent="CoinPositions"]
+position = Vector2(300, 250)
+
+[node name="Coin3" type="Marker2D" parent="CoinPositions"]
+position = Vector2(500, 150)
+
+[node name="Coin4" type="Marker2D" parent="CoinPositions"]
+position = Vector2(700, 100)
+
+[node name="GoalPosition" type="Marker2D" parent="."]
+position = Vector2(900, 50)

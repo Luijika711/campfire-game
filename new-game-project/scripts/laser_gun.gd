@@ -32,7 +32,7 @@ func _ready() -> void:
 	# Enable glow effect
 	laser_beam.modulate = Color(1, 1, 1, 1)
 	add_child(laser_beam)
-	
+
 	# Create glow effect for laser
 	_create_glow_beam()
 

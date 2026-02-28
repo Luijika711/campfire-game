@@ -35,7 +35,7 @@ func _ready() -> void:
 	else:
 		print("ERROR: Background node not found!")
 	print("=== END BACKGROUND DEBUG ===")
-	
+
 	GameManager.coins_changed.connect(_on_coins_changed)
 	_update_coin_label(0)
 

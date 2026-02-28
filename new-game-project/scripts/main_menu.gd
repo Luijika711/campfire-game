@@ -2,11 +2,11 @@ extends Control
 
 var click_sound: AudioStream = null
 
-@onready var title_label: Label = $VBoxContainer/TitleLabel
-@onready var play_button: Button = $VBoxContainer/PlayButton
-@onready var level_select_button: Button = $VBoxContainer/LevelSelectButton
-@onready var settings_button: Button = $VBoxContainer/SettingsButton
-@onready var quit_button: Button = $VBoxContainer/QuitButton
+@onready var title_label: Label = $Panel/VBoxContainer/TitleLabel
+@onready var play_button: Button = $Panel/VBoxContainer/PlayButton
+@onready var level_select_button: Button = $Panel/VBoxContainer/LevelSelectButton
+@onready var settings_button: Button = $Panel/VBoxContainer/SettingsButton
+@onready var quit_button: Button = $Panel/VBoxContainer/QuitButton
 
 func _ready():
 	# Load click sound if it exists

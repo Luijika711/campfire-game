@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://t1yxljrhlv0q" path="res://assets/wallpaper-sky-lvl1.jpeg" id="1_bg"]
+
+[sub_resource type="TileSet" id="TileSet_sky"]
+tile_size = Vector2i(32, 32)
+
+[node name="LevelSkyIslands" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+position = Vector2(960, 540)
+texture = ExtResource("1_bg")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_sky")
+format = 2
+layer_0/name = "Ground"
+layer_0/tile_data = PackedInt32Array(983042, 0, 0, 983043, 0, 0, 983044, 0, 0, 983045, 0, 0, 983046, 0, 0, 983047, 0, 0, 786444, 0, 0, 786445, 0, 0, 786446, 0, 0, 786447, 0, 0, 786448, 0, 0, 786449, 0, 0, 655382, 0, 0, 655383, 0, 0, 655384, 0, 0, 655385, 0, 0, 655386, 0, 0, 655387, 0, 0, 524320, 0, 0, 524321, 0, 0, 524322, 0, 0, 524323, 0, 0, 524324, 0, 0, 524325, 0, 0, 393258, 0, 0, 393259, 0, 0, 393260, 0, 0, 393261, 0, 0, 393262, 0, 0, 393263, 0, 0, 393264, 0, 0, 393265, 0, 0)
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="Spawn0" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(100, 300)
+
+[node name="CoinPositions" type="Node2D" parent="."]
+
+[node name="Coin0" type="Marker2D" parent="CoinPositions"]
+position = Vector2(300, 250)
+
+[node name="Coin1" type="Marker2D" parent="CoinPositions"]
+position = Vector2(500, 200)
+
+[node name="Coin2" type="Marker2D" parent="CoinPositions"]
+position = Vector2(700, 250)
+
+[node name="Coin3" type="Marker2D" parent="CoinPositions"]
+position = Vector2(900, 150)
+
+[node name="Coin4" type="Marker2D" parent="CoinPositions"]
+position = Vector2(400, 400)
+
+[node name="GoalPosition" type="Marker2D" parent="."]
+position = Vector2(1000, 100)

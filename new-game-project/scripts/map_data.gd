@@ -4,6 +4,7 @@ class_name MapData
 @export var map_name: String = "Default Map"
 @export var description: String = "A simple platforming map"
 @export var tile_set: TileSet
+@export var background_texture: Texture2D
 
 @export var tiles: Array[Dictionary] = []
 @export var spawn_points: Array[Vector2] = [Vector2(100, 400)]

@@ -10,6 +10,7 @@ extends Weapon
 
 var current_ammo: int
 var is_reloading: bool = false
+var held_icon: Polygon2D
 
 @onready var muzzle_flash: Polygon2D
 
@@ -20,6 +21,19 @@ func _ready() -> void:
 	damage = 10
 	cooldown = 0.12
 	current_ammo = max_ammo
+
+	# Create held weapon icon (always visible when equipped)
+	held_icon = Polygon2D.new()
+	held_icon.name = "HeldIcon"
+	held_icon.polygon = PackedVector2Array([
+		Vector2(6, -3), Vector2(22, -3),
+		Vector2(26, -1), Vector2(26, 1),
+		Vector2(22, 3), Vector2(6, 3),
+		Vector2(4, 1), Vector2(4, -1),
+	])
+	held_icon.color = Color(0.5, 0.5, 0.55, 0.9)
+	held_icon.position = Vector2(0, -4)
+	add_child(held_icon)
 
 	# Create muzzle flash visual
 	muzzle_flash = Polygon2D.new()

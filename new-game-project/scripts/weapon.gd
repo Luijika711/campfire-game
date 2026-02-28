@@ -29,6 +29,11 @@ var can_attack: bool = true
 
 func _ready() -> void:
 	add_to_group("weapons")
+	_create_held_visual()
+
+func _create_held_visual() -> void:
+	# Override in subclasses for custom held visuals
+	pass
 
 func _process(delta: float) -> void:
 	if is_on_cooldown:

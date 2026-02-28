@@ -24,6 +24,7 @@ sources/0 = SubResource("TileSetAtlasSource_sky")
 script = ExtResource("3_script")
 level_name = "Sky Islands"
 description = "Jump between floating islands"
+background_hue_shift = 0.55
 
 [node name="Background" type="Sprite2D" parent="."]
 z_index = -10

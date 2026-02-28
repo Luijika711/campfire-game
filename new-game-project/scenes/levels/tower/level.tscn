@@ -20,6 +20,7 @@ sources/0 = SubResource("TileSetAtlasSource_tower")
 script = ExtResource("3_script")
 level_name = "Tower Climb"
 description = "Climb to the top!"
+background_hue_shift = 0.75
 
 [node name="Background" type="Sprite2D" parent="." unique_id=860102046]
 z_index = -10

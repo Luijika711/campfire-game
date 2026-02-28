@@ -444,6 +444,7 @@ sources/1 = SubResource("TileSetAtlasSource_qfmwo")
 script = ExtResource("3_script")
 level_name = "Basic Platformer"
 description = "A simple map with platforms and coins"
+background_hue_shift = 0.3
 
 [node name="Background" type="Sprite2D" parent="." unique_id=21258916]
 z_index = -10

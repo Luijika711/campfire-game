@@ -457,6 +457,7 @@ sources/1 = SubResource("TileSetAtlasSource_ltlw1")
 script = ExtResource("3_script")
 level_name = "Test Level 1234 Rika"
 description = "Jump between floating islands"
+background_hue_shift = 0.4
 
 [node name="Background" type="Sprite2D" parent="." unique_id=577252468]
 z_index = -10

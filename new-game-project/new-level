@@ -2,6 +2,7 @@
 """
 New Level Generator for Godot Project (Interactive)
 Creates new levels by duplicating existing ones or from a template.
+Supports parallax background selection and hue-shift color overlay.
 """
 
 import os
@@ -13,6 +14,96 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent
 LEVELS_DIR = PROJECT_ROOT / "scenes" / "levels"
 TEMPLATE_LEVEL = LEVELS_DIR / "basic" / "level.tscn"
+WALLPAPERS_DIR = PROJECT_ROOT / "assets" / "wallpapers"
+
+# Filenames to exclude from parallax layers (source/reference images)
+LAYER_EXCLUDE_STEMS = {"orig", "orig_big"}
+
+
+def _find_layer_pngs(directory):
+    """Find PNG files suitable as parallax layers in a directory."""
+    return [
+        f.name for f in directory.iterdir()
+        if f.suffix.lower() == ".png" and f.stem not in LAYER_EXCLUDE_STEMS
+    ]
+
+
+def _natural_sort_key(filename):
+    """Sort key for natural ordering (numeric first, then alphabetic)."""
+    stem = Path(filename).stem
+    match = re.match(r'^(\d+)', stem)
+    if match:
+        return (0, int(match.group(1)), stem)
+    return (1, 0, stem.lower())
+
+
+def _make_display_name(dir_name):
+    """Generate a human-friendly display name from a directory name."""
+    name = dir_name.replace("_", " ").replace("-", " ")
+    cleaned = re.sub(r'\b[Pp]aralax\b', '', name)
+    cleaned = re.sub(r'\b[Pp]arallax\b', '', cleaned)
+    cleaned = re.sub(r'\b[Bb]ackgrounds?\b', '', cleaned)
+    cleaned = cleaned.strip()
+    if len(cleaned) < 2:
+        return name.title()
+    return cleaned.title()
+
+
+def discover_parallax_packs():
+    """Dynamically discover parallax packs from the wallpapers directory."""
+    if not WALLPAPERS_DIR.exists():
+        return {}
+
+    packs = {}
+    for pack_dir in sorted(WALLPAPERS_DIR.iterdir()):
+        if not pack_dir.is_dir():
+            continue
+
+        pack_name = pack_dir.name
+        subdir = ""
+
+        png_files = _find_layer_pngs(pack_dir)
+
+        # If no PNGs found, check one level of subdirectories
+        if not png_files:
+            for sub in sorted(pack_dir.iterdir()):
+                if sub.is_dir():
+                    png_files = _find_layer_pngs(sub)
+                    if png_files:
+                        subdir = sub.name
+                        break
+
+        if not png_files:
+            continue
+
+        png_files.sort(key=_natural_sort_key)
+
+        # Auto-distribute motion scales: 0.0 (static background) to 0.9 (foreground)
+        n = len(png_files)
+        layers = []
+        for i, filename in enumerate(png_files):
+            scale = 0.0 if n == 1 else round(0.9 * i / (n - 1), 2)
+            layers.append((filename, scale, scale))
+
+        packs[pack_name] = {
+            "display_name": _make_display_name(pack_name),
+            "subdir": subdir,
+            "image_width": 1920,
+            "layers": layers,
+        }
+
+    return packs
+
+# Color presets: name -> hue_shift value
+COLOR_PRESETS = [
+    ("Neutral (original colors)", 0.0),
+    ("Green",                     0.15),
+    ("Amber / Gold",              0.3),
+    ("Orange",                    0.4),
+    ("Red / Magenta",             0.55),
+    ("Purple",                    0.75),
+    ("Pink / Violet",             0.85),
+]
 
 def clear_screen():
     """Clear the terminal screen."""
@@ -56,6 +147,115 @@ def replace_uids(content):
     
     return content
 
+def get_uid_from_import(image_path):
+    """Read the UID from a Godot .import file."""
+    import_file = Path(str(image_path) + ".import")
+    if not import_file.exists():
+        return None
+    for line in import_file.read_text().splitlines():
+        if line.startswith("uid="):
+            # uid="uid://xxxxx"
+            match = re.search(r'"(uid://[^"]+)"', line)
+            if match:
+                return match.group(1)
+    return None
+
+def get_available_parallax_packs():
+    """Discover available parallax packs from the wallpapers directory."""
+    return discover_parallax_packs()
+
+def select_parallax():
+    """Let user select a parallax background pack."""
+    packs = get_available_parallax_packs()
+    
+    print("\n  Available parallax backgrounds:")
+    print(f"    0. None (flat background)")
+    options = list(packs.items())
+    for i, (pack_name, pack_info) in enumerate(options, 1):
+        layer_count = len(pack_info["layers"])
+        print(f"    {i}. {pack_info['display_name']}  ({pack_name}, {layer_count} layers)")
+    
+    while True:
+        choice = input(f"\n  Select parallax (0-{len(options)}, Enter for 1): ").strip()
+        if not choice:
+            choice = "1"
+        if choice == "0":
+            return None, None
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(options):
+                pack_name, pack_info = options[idx]
+                return pack_name, pack_info
+        print(f"  Invalid choice. Enter 0-{len(options)}")
+
+def select_color():
+    """Let user select a color overlay (hue shift)."""
+    print("\n  Color overlay (hue-shifts the background):")
+    for i, (name, value) in enumerate(COLOR_PRESETS):
+        marker = " ←" if value == 0.0 else ""
+        print(f"    {i}. {name} ({value}){marker}")
+    print(f"    {len(COLOR_PRESETS)}. Custom value (0.0 - 1.0)")
+    
+    while True:
+        choice = input(f"\n  Select color (0-{len(COLOR_PRESETS)}, Enter for 0): ").strip()
+        if not choice:
+            return 0.0
+        if choice.isdigit():
+            idx = int(choice)
+            if 0 <= idx < len(COLOR_PRESETS):
+                return COLOR_PRESETS[idx][1]
+            if idx == len(COLOR_PRESETS):
+                while True:
+                    val = input("  Enter hue value (0.0 - 1.0): ").strip()
+                    try:
+                        v = float(val)
+                        if 0.0 <= v <= 1.0:
+                            return v
+                    except ValueError:
+                        pass
+                    print("  Invalid. Enter a number between 0.0 and 1.0")
+        print(f"  Invalid choice. Enter 0-{len(COLOR_PRESETS)}")
+
+def build_parallax_ext_resources(pack_name, pack_info):
+    """Build ext_resource lines for a parallax pack."""
+    lines = []
+    pack_dir = WALLPAPERS_DIR / pack_name
+    if pack_info["subdir"]:
+        pack_dir = pack_dir / pack_info["subdir"]
+    
+    res_prefix = f"res://assets/wallpapers/{pack_name}"
+    if pack_info["subdir"]:
+        res_prefix += f"/{pack_info['subdir']}"
+    
+    for i, (filename, _, _) in enumerate(pack_info["layers"]):
+        image_path = pack_dir / filename
+        uid = get_uid_from_import(image_path)
+        uid_str = f' uid="{uid}"' if uid else ""
+        res_id = f"px_{i+1}"
+        lines.append(
+            f'[ext_resource type="Texture2D"{uid_str} '
+            f'path="{res_prefix}/{filename}" id="{res_id}"]'
+        )
+    return "\n".join(lines)
+
+def build_parallax_nodes(pack_info):
+    """Build ParallaxBackground + ParallaxLayer node definitions."""
+    w = pack_info["image_width"]
+    lines = []
+    lines.append(f'[node name="ParallaxBackground" type="ParallaxBackground" parent="."]')
+    
+    for i, (filename, mx, my) in enumerate(pack_info["layers"]):
+        layer_name = Path(filename).stem.replace(".", "_")
+        lines.append(f'')
+        lines.append(f'[node name="Layer{i+1}_{layer_name}" type="ParallaxLayer" parent="ParallaxBackground"]')
+        lines.append(f'motion_scale = Vector2({mx}, {my})')
+        lines.append(f'motion_mirroring = Vector2({w}, 0)')
+        lines.append(f'')
+        lines.append(f'[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer{i+1}_{layer_name}"]')
+        lines.append(f'texture = ExtResource("px_{i+1}")')
+    
+    return "\n".join(lines)
+
 def update_level_name(content, name):
     """Update the level name in the content."""
     # Convert snake_case or kebab-case to Title Case
@@ -73,7 +273,7 @@ def validate_level_name(name):
         return False, f"Level '{name}' already exists"
     return True, None
 
-def create_level_from_template(name, template_path=None):
+def create_level_from_template(name, template_path=None, parallax_pack=None, parallax_info=None, hue_shift=0.0):
     """Create a new level by copying from a template."""
     template_path = template_path or TEMPLATE_LEVEL
     
@@ -97,6 +297,39 @@ def create_level_from_template(name, template_path=None):
     node_name = name.replace('_', ' ').replace('-', ' ').title().replace(' ', '')
     content = re.sub(r'\[node name="[^"]*" type="Node2D"(?! parent="\.")', f'[node name="Level{node_name}" type="Node2D"', content)
     
+    # Inject parallax background (replace old Background node if present)
+    if parallax_pack and parallax_info:
+        # Remove old wallpaper ext_resource
+        content = re.sub(r'\[ext_resource[^\]]*wallpaper[^\]]*\]\n?', '', content)
+        
+        # Add parallax ext_resources before the first sub_resource
+        px_resources = build_parallax_ext_resources(parallax_pack, parallax_info)
+        content = content.replace(
+            '\n[sub_resource',
+            f'\n{px_resources}\n\n[sub_resource',
+            1
+        )
+        
+        # Replace old Background node with ParallaxBackground
+        px_nodes = build_parallax_nodes(parallax_info)
+        bg_pattern = r'\[node name="Background"[^\[]*'
+        if re.search(bg_pattern, content):
+            content = re.sub(bg_pattern, px_nodes + '\n\n', content)
+        else:
+            # Insert ParallaxBackground before TileMap
+            content = content.replace(
+                '[node name="TileMap"',
+                px_nodes + '\n\n[node name="TileMap"'
+            )
+    
+    # Inject hue shift property
+    if hue_shift != 0.0:
+        content = re.sub(
+            r'(description = "[^"]*")',
+            rf'\1\nbackground_hue_shift = {hue_shift}',
+            content
+        )
+    
     # Write new level
     level_file = level_dir / "level.tscn"
     with open(level_file, 'w') as f:
@@ -104,7 +337,7 @@ def create_level_from_template(name, template_path=None):
     
     return True
 
-def create_empty_level(name):
+def create_empty_level(name, parallax_pack=None, parallax_info=None, hue_shift=0.0):
     """Create a minimal new level with basic structure."""
     level_dir = LEVELS_DIR / name
     level_dir.mkdir(parents=True)
@@ -112,9 +345,23 @@ def create_empty_level(name):
     display_name = name.replace('_', ' ').replace('-', ' ').title()
     node_name = display_name.replace(' ', '')
     
+    # Build ext_resources
+    ext_resources = '[ext_resource type="Script" uid="uid://clk2u0lgieqwe" path="res://scripts/level_base.gd" id="1_script"]'
+    if parallax_pack and parallax_info:
+        ext_resources += "\n" + build_parallax_ext_resources(parallax_pack, parallax_info)
+    
+    # Build hue shift line
+    hue_line = f'\nbackground_hue_shift = {hue_shift}' if hue_shift != 0.0 else ""
+    
+    # Build background nodes
+    if parallax_pack and parallax_info:
+        bg_nodes = build_parallax_nodes(parallax_info)
+    else:
+        bg_nodes = ""
+    
     content = f'''[gd_scene format=3 uid="uid://clgdytxwaysrx"]
 
-[ext_resource type="Script" uid="uid://clk2u0lgieqwe" path="res://scripts/level_base.gd" id="1_script"]
+{ext_resources}
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_h3wap"]
 load_path = "res://.godot/imported/tile_atlas.png-f20f463f080df8ef4c68366accb9fb7b.ctex"
@@ -134,7 +381,9 @@ sources/0 = SubResource("TileSetAtlasSource_basic")
 [node name="Level{node_name}" type="Node2D" unique_id={generate_uid()}]
 script = ExtResource("1_script")
 level_name = "{display_name}"
-description = "A new level"
+description = "A new level"{hue_line}
+
+{bg_nodes}
 
 [node name="TileMap" type="TileMap" parent="." unique_id={generate_uid()}]
 tile_set = SubResource("TileSet_basic")
@@ -151,6 +400,9 @@ position = Vector2(100, 100)
 [node name="GoalPosition" type="Marker2D" parent="." unique_id={generate_uid()}]
 position = Vector2(500, 100)
 '''
+    
+    # Replace the UID to be unique
+    content = replace_uids(content)
     
     level_file = level_dir / "level.tscn"
     with open(level_file, 'w') as f:
@@ -215,6 +467,32 @@ def prompt_for_level_name():
         else:
             print(f"  Error: {error}")
 
+def prompt_for_background():
+    """Prompt user for parallax background and color overlay."""
+    print("\n" + "-" * 60)
+    print("  Background Settings")
+    print("-" * 60)
+    
+    pack_name, pack_info = select_parallax()
+    hue_shift = select_color()
+    
+    if pack_name:
+        print(f"\n  ✓ Parallax: {pack_info['display_name']}")
+    else:
+        print(f"\n  ✓ Parallax: None (flat background)")
+    
+    color_name = "Neutral"
+    for name, val in COLOR_PRESETS:
+        if val == hue_shift:
+            color_name = name
+            break
+    else:
+        if hue_shift != 0.0:
+            color_name = f"Custom ({hue_shift})"
+    print(f"  ✓ Color: {color_name}")
+    
+    return pack_name, pack_info, hue_shift
+
 def show_main_menu():
     """Show the main menu and get user choice."""
     print("\nWhat would you like to do?")
@@ -253,9 +531,10 @@ def main():
                 continue
             
             level_name = prompt_for_level_name()
+            pack_name, pack_info, hue_shift = prompt_for_background()
             
             print(f"\nCreating level '{level_name}' from template...")
-            if create_level_from_template(level_name, template_path):
+            if create_level_from_template(level_name, template_path, pack_name, pack_info, hue_shift):
                 print(f"\n✓ SUCCESS! Created new level: {level_name}")
                 print(f"  Location: scenes/levels/{level_name}/level.tscn")
                 print("\nNext steps:")
@@ -271,9 +550,10 @@ def main():
             print("-" * 60)
             
             level_name = prompt_for_level_name()
+            pack_name, pack_info, hue_shift = prompt_for_background()
             
             print(f"\nCreating empty level '{level_name}'...")
-            if create_empty_level(level_name):
+            if create_empty_level(level_name, pack_name, pack_info, hue_shift):
                 print(f"\n✓ SUCCESS! Created empty level: {level_name}")
                 print(f"  Location: scenes/levels/{level_name}/level.tscn")
                 print("\nNext steps:")

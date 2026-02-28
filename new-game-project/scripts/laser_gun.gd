@@ -104,7 +104,7 @@ func _fire_laser(direction: Vector2) -> void:
 		var collider = result.collider
 		var hit_pos = result.position
 
-		query.exclude.append(collider.get_rid())
+		query.exclude.append(result.rid)
 
 		# Stop at walls
 		if collider.is_in_group("walls") or collider is TileMapLayer or collider is StaticBody2D:

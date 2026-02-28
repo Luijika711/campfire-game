@@ -1,16 +1,16 @@
-[gd_scene format=3 uid="uid://ub5luacrqc57"]
+[gd_scene format=3 uid="uid://bbke4jr67idwl"]
 
-[ext_resource type="Texture2D" uid="uid://bqliocrffwp5s" path="res://assets/dungeon_tiles.png" id="3_mo2tb"]
-[ext_resource type="Script" uid="uid://clk2u0lgieqwe" path="res://scripts/level_base.gd" id="3_script"]
-[ext_resource type="Texture2D" uid="uid://cfe228dqle36q" path="res://assets/wallpapers/paralax-skies/skies/Sky_sky.png" id="px_1"]
-[ext_resource type="Texture2D" uid="uid://cbnjaahqs1gan" path="res://assets/wallpapers/paralax-skies/skies/sky_moon.png" id="px_2"]
-[ext_resource type="Texture2D" uid="uid://hxftpnq3x0ob" path="res://assets/wallpapers/paralax-skies/skies/sky_clouds.png" id="px_3"]
-[ext_resource type="Texture2D" uid="uid://sq6yrv6du5lc" path="res://assets/wallpapers/paralax-skies/skies/Sky_cloud_single.png" id="px_4"]
-[ext_resource type="Texture2D" uid="uid://cjpdprtjnk5g0" path="res://assets/wallpapers/paralax-skies/skies/Sky_back_mountain.png" id="px_5"]
-[ext_resource type="Texture2D" uid="uid://3v3smwebc1ls" path="res://assets/wallpapers/paralax-skies/skies/sky_cloud_floor.png" id="px_6"]
-[ext_resource type="Texture2D" uid="uid://dgk45j05xefsc" path="res://assets/wallpapers/paralax-skies/skies/sky_front_mountain.png" id="px_7"]
-[ext_resource type="Texture2D" uid="uid://cfxm3hhxsg47j" path="res://assets/wallpapers/paralax-skies/skies/Sky_front_cloud.png" id="px_8"]
-[ext_resource type="Texture2D" uid="uid://bsmc7mej4j3pf" path="res://assets/wallpapers/paralax-skies/skies/sky_cloud_floor_2.png" id="px_9"]
+[ext_resource type="Script" uid="uid://clk2u0lgieqwe" path="res://scripts/level_base.gd" id="1_5o5wm"]
+[ext_resource type="Texture2D" uid="uid://cfe228dqle36q" path="res://assets/wallpapers/paralax-skies/skies/Sky_sky.png" id="2_cy1vu"]
+[ext_resource type="Texture2D" uid="uid://cbnjaahqs1gan" path="res://assets/wallpapers/paralax-skies/skies/sky_moon.png" id="3_1ganh"]
+[ext_resource type="Texture2D" uid="uid://hxftpnq3x0ob" path="res://assets/wallpapers/paralax-skies/skies/sky_clouds.png" id="4_u5vsp"]
+[ext_resource type="Texture2D" uid="uid://sq6yrv6du5lc" path="res://assets/wallpapers/paralax-skies/skies/Sky_cloud_single.png" id="5_r58js"]
+[ext_resource type="Texture2D" uid="uid://cjpdprtjnk5g0" path="res://assets/wallpapers/paralax-skies/skies/Sky_back_mountain.png" id="6_rgrny"]
+[ext_resource type="Texture2D" uid="uid://3v3smwebc1ls" path="res://assets/wallpapers/paralax-skies/skies/sky_cloud_floor.png" id="7_j60fg"]
+[ext_resource type="Texture2D" uid="uid://dgk45j05xefsc" path="res://assets/wallpapers/paralax-skies/skies/sky_front_mountain.png" id="8_ntm05"]
+[ext_resource type="Texture2D" uid="uid://cfxm3hhxsg47j" path="res://assets/wallpapers/paralax-skies/skies/Sky_front_cloud.png" id="9_w8m8o"]
+[ext_resource type="Texture2D" uid="uid://bsmc7mej4j3pf" path="res://assets/wallpapers/paralax-skies/skies/sky_cloud_floor_2.png" id="10_i8njc"]
+[ext_resource type="Texture2D" uid="uid://bqliocrffwp5s" path="res://assets/dungeon_tiles.png" id="11_msyu1"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_h3wap"]
 load_path = "res://.godot/imported/tile_atlas.png-f20f463f080df8ef4c68366accb9fb7b.ctex"
@@ -23,7 +23,7 @@ texture = SubResource("CompressedTexture2D_h3wap")
 1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qfmwo"]
-texture = ExtResource("3_mo2tb")
+texture = ExtResource("11_msyu1")
 margins = Vector2i(16, 16)
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
@@ -449,7 +449,7 @@ sources/0 = SubResource("TileSetAtlasSource_basic")
 sources/1 = SubResource("TileSetAtlasSource_qfmwo")
 
 [node name="LevelAsldfkjasdflasdf" type="Node2D" unique_id=728634425]
-script = ExtResource("3_script")
+script = ExtResource("1_5o5wm")
 level_name = "Asldfkjasdflasdf"
 description = "A simple map with platforms and coins"
 
@@ -460,7 +460,7 @@ motion_scale = Vector2(0.05, 0.05)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer1" unique_id=784213246]
-texture = ExtResource("px_1")
+texture = ExtResource("2_cy1vu")
 centered = false
 
 [node name="Layer2" type="ParallaxLayer" parent="ParallaxBackground" unique_id=782910311]
@@ -468,7 +468,7 @@ motion_scale = Vector2(0.1, 0.1)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer2" unique_id=731292169]
-texture = ExtResource("px_2")
+texture = ExtResource("3_1ganh")
 centered = false
 
 [node name="Layer3fx" type="ParallaxLayer" parent="ParallaxBackground" unique_id=674498881]
@@ -476,7 +476,7 @@ motion_scale = Vector2(0.15, 0.15)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer3fx" unique_id=463405469]
-texture = ExtResource("px_3")
+texture = ExtResource("4_u5vsp")
 centered = false
 
 [node name="Layer4" type="ParallaxLayer" parent="ParallaxBackground" unique_id=461547356]
@@ -484,7 +484,7 @@ motion_scale = Vector2(0.25, 0.25)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer4" unique_id=791871913]
-texture = ExtResource("px_4")
+texture = ExtResource("5_r58js")
 centered = false
 
 [node name="Layer5" type="ParallaxLayer" parent="ParallaxBackground" unique_id=657265763]
@@ -492,7 +492,7 @@ motion_scale = Vector2(0.35, 0.35)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer5" unique_id=383078759]
-texture = ExtResource("px_5")
+texture = ExtResource("6_rgrny")
 centered = false
 
 [node name="Layer6fx" type="ParallaxLayer" parent="ParallaxBackground" unique_id=588519018]
@@ -500,7 +500,7 @@ motion_scale = Vector2(0.45, 0.45)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer6fx" unique_id=374503626]
-texture = ExtResource("px_6")
+texture = ExtResource("7_j60fg")
 centered = false
 
 [node name="Layer7" type="ParallaxLayer" parent="ParallaxBackground" unique_id=625370073]
@@ -508,7 +508,7 @@ motion_scale = Vector2(0.6, 0.6)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer7" unique_id=117498230]
-texture = ExtResource("px_7")
+texture = ExtResource("8_ntm05")
 centered = false
 
 [node name="Layer8fx" type="ParallaxLayer" parent="ParallaxBackground" unique_id=647878498]
@@ -516,7 +516,7 @@ motion_scale = Vector2(0.75, 0.75)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer8fx" unique_id=814845554]
-texture = ExtResource("px_8")
+texture = ExtResource("9_w8m8o")
 centered = false
 
 [node name="Layer9" type="ParallaxLayer" parent="ParallaxBackground" unique_id=810465417]
@@ -524,7 +524,7 @@ motion_scale = Vector2(0.9, 0.9)
 motion_mirroring = Vector2(1920, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer9" unique_id=300838284]
-texture = ExtResource("px_9")
+texture = ExtResource("10_i8njc")
 centered = false
 
 [node name="Layer1_Sky_sky" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1503504480]
@@ -532,7 +532,7 @@ motion_scale = Vector2(0, 0)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer1_Sky_sky" unique_id=2043992946]
-texture = ExtResource("px_1")
+texture = ExtResource("2_cy1vu")
 centered = false
 
 [node name="Layer2_sky_moon" type="ParallaxLayer" parent="ParallaxBackground" unique_id=61318304]
@@ -540,7 +540,7 @@ motion_scale = Vector2(0.02, 0.02)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer2_sky_moon" unique_id=644022251]
-texture = ExtResource("px_2")
+texture = ExtResource("3_1ganh")
 centered = false
 
 [node name="Layer3_sky_clouds" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1435771013]
@@ -548,7 +548,7 @@ motion_scale = Vector2(0.1, 0.1)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer3_sky_clouds" unique_id=848159943]
-texture = ExtResource("px_3")
+texture = ExtResource("4_u5vsp")
 centered = false
 
 [node name="Layer4_Sky_cloud_single" type="ParallaxLayer" parent="ParallaxBackground" unique_id=383305482]
@@ -556,7 +556,7 @@ motion_scale = Vector2(0.15, 0.15)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer4_Sky_cloud_single" unique_id=547632418]
-texture = ExtResource("px_4")
+texture = ExtResource("5_r58js")
 centered = false
 
 [node name="Layer5_Sky_back_mountain" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1731097921]
@@ -564,7 +564,7 @@ motion_scale = Vector2(0.25, 0.25)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer5_Sky_back_mountain" unique_id=606213756]
-texture = ExtResource("px_5")
+texture = ExtResource("6_rgrny")
 centered = false
 
 [node name="Layer6_sky_cloud_floor" type="ParallaxLayer" parent="ParallaxBackground" unique_id=306134863]
@@ -572,7 +572,7 @@ motion_scale = Vector2(0.4, 0.4)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer6_sky_cloud_floor" unique_id=291544577]
-texture = ExtResource("px_6")
+texture = ExtResource("7_j60fg")
 centered = false
 
 [node name="Layer7_sky_front_mountain" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1698989296]
@@ -580,7 +580,7 @@ motion_scale = Vector2(0.6, 0.6)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer7_sky_front_mountain" unique_id=926537888]
-texture = ExtResource("px_7")
+texture = ExtResource("8_ntm05")
 centered = false
 
 [node name="Layer8_Sky_front_cloud" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1446847311]
@@ -588,7 +588,7 @@ motion_scale = Vector2(0.75, 0.75)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer8_Sky_front_cloud" unique_id=1080949988]
-texture = ExtResource("px_8")
+texture = ExtResource("9_w8m8o")
 centered = false
 
 [node name="Layer9_sky_cloud_floor_2" type="ParallaxLayer" parent="ParallaxBackground" unique_id=296462620]
@@ -596,7 +596,7 @@ motion_scale = Vector2(0.9, 0.9)
 motion_mirroring = Vector2(1900, 0)
 
 [node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/Layer9_sky_cloud_floor_2" unique_id=746937835]
-texture = ExtResource("px_9")
+texture = ExtResource("10_i8njc")
 centered = false
 
 [node name="ParallaxBackground2" type="ParallaxBackground" parent="." unique_id=1931898580]
@@ -619,6 +619,23 @@ position = Vector2(138, 169)
 
 [node name="Spawn2" type="Marker2D" parent="SpawnPoints" unique_id=557356799]
 position = Vector2(276, 146)
+
+[node name="CoinPositions" type="Node2D" parent="." unique_id=436548556]
+
+[node name="Coin0" type="Marker2D" parent="CoinPositions" unique_id=940114698]
+position = Vector2(300, 400)
+
+[node name="Coin1" type="Marker2D" parent="CoinPositions" unique_id=506176375]
+position = Vector2(600, 300)
+
+[node name="Coin2" type="Marker2D" parent="CoinPositions" unique_id=199882479]
+position = Vector2(900, 200)
+
+[node name="Coin3" type="Marker2D" parent="CoinPositions" unique_id=630550304]
+position = Vector2(500, 550)
+
+[node name="Coin4" type="Marker2D" parent="CoinPositions" unique_id=178791406]
+position = Vector2(800, 550)
 
 [node name="GoalPosition" type="Marker2D" parent="." unique_id=574793587]
 position = Vector2(1050, 186)

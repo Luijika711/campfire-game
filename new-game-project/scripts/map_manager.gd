@@ -53,4 +53,3 @@ func _register_level(map_id: String, scene_path: String) -> void:
 
 func get_available_maps() -> Dictionary:
 	return available_maps.duplicate()
-

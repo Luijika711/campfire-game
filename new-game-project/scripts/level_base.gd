@@ -46,19 +46,27 @@ func _setup_parallax() -> void:
 	var parallax_bg = find_child("ParallaxBackground")
 	if not parallax_bg:
 		return
+	
 	var viewport_size := get_viewport().get_visible_rect().size
-	var min_zoom := 0.3
-	var needed_height := viewport_size.y / min_zoom
+	
 	for layer in parallax_bg.get_children():
 		if not layer is ParallaxLayer:
 			continue
 		layer.motion_scale.y = 0.0
+		
 		for sprite in layer.get_children():
 			if sprite is Sprite2D and sprite.texture:
 				var tex_size = sprite.texture.get_size()
-				var scale_factor := maxf(needed_height / tex_size.y, 1.0)
+				
+				# Scale sprite to fill viewport height
+				var scale_factor: float = viewport_size.y / tex_size.y
 				sprite.scale = Vector2(scale_factor, scale_factor)
-				sprite.centered = true
+				
+				# Center sprite vertically and position to cover full width
+				sprite.centered = false
+				sprite.position.y = 0
+				
+				# Set mirroring for infinite horizontal scroll
 				layer.motion_mirroring.x = tex_size.x * scale_factor
 
 func _apply_hue_shift() -> void:

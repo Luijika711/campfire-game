@@ -9,7 +9,6 @@ extends Node2D
 @onready var tile_map: TileMap = $TileMap
 @onready var platforms: Node2D = $Platforms
 @onready var coins: Node2D = $Coins
-@onready var goal: Node2D = $Goal
 @onready var host_player: CharacterBody2D = $HostPlayer
 @onready var background: Sprite2D = $Background
 
@@ -99,10 +98,6 @@ func _load_map(map_id: String) -> void:
 
 		# Spawn coins
 		_spawn_coins(map_data.coin_positions)
-
-		# Position goal
-		if goal != null:
-			goal.position = map_data.goal_position
 
 		# Setup player manager spawn points
 		if $PlayerManager:

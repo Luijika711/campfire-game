@@ -1,7 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://game_scene"]
+[gd_scene load_steps=7 format=3 uid="uid://game_scene"]
 
 [ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
-[ext_resource type="PackedScene" uid="uid://goal123" path="res://scenes/goal.tscn" id="3_goal"]
 [ext_resource type="PackedScene" path="res://scenes/qr_display.tscn" id="6_qr_display"]
 [ext_resource type="PackedScene" uid="uid://pause_menu" path="res://scenes/pause_menu.tscn" id="7_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://enemy_spawner" path="res://scenes/enemy_spawner.tscn" id="8_enemy_spawner"]
@@ -18,9 +17,6 @@ script = ExtResource("10_camera")
 position = Vector2(960, 540)
 
 [node name="Coins" type="Node2D" parent="."]
-
-[node name="Goal" parent="." instance=ExtResource("3_goal")]
-position = Vector2(1050, 186)
 
 [node name="EnemySpawner" parent="." instance=ExtResource("8_enemy_spawner")]
 position = Vector2(600, 400)

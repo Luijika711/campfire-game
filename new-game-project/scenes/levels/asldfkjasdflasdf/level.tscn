@@ -547,6 +547,3 @@ position = Vector2(138, 169)
 
 [node name="Spawn2" type="Marker2D" parent="SpawnPoints" unique_id=557356799]
 position = Vector2(276, 146)
-
-[node name="GoalPosition" type="Marker2D" parent="." unique_id=574793587]
-position = Vector2(1050, 186)

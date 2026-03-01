@@ -547,23 +547,3 @@ position = Vector2(138, 169)
 
 [node name="Spawn2" type="Marker2D" parent="SpawnPoints" unique_id=144084336]
 position = Vector2(276, 146)
-
-[node name="CoinPositions" type="Node2D" parent="." unique_id=554014269]
-
-[node name="Coin0" type="Marker2D" parent="CoinPositions" unique_id=599929012]
-position = Vector2(300, 400)
-
-[node name="Coin1" type="Marker2D" parent="CoinPositions" unique_id=297047961]
-position = Vector2(600, 300)
-
-[node name="Coin2" type="Marker2D" parent="CoinPositions" unique_id=760671711]
-position = Vector2(900, 200)
-
-[node name="Coin3" type="Marker2D" parent="CoinPositions" unique_id=753239415]
-position = Vector2(500, 550)
-
-[node name="Coin4" type="Marker2D" parent="CoinPositions" unique_id=861549760]
-position = Vector2(800, 550)
-
-[node name="GoalPosition" type="Marker2D" parent="." unique_id=297104738]
-position = Vector2(1050, 186)

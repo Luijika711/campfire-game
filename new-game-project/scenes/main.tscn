@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://bqxre1pl82yx" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Texture2D" uid="uid://t1yxljrhlv0q" path="res://assets/wallpaper-sky-lvl1.jpeg" id="2_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://player123" path="res://scenes/player.tscn" id="2_player"]
-[ext_resource type="PackedScene" uid="uid://goal123" path="res://scenes/goal.tscn" id="4_goal"]
 [ext_resource type="PackedScene" path="res://scenes/player_networked.tscn" id="5_player_networked"]
 [ext_resource type="Script" uid="uid://b8eydbaqtv2xa" path="res://scripts/player_manager.gd" id="6_player_manager"]
 [ext_resource type="PackedScene" path="res://scenes/qr_display.tscn" id="7_qr_display"]
@@ -81,9 +80,6 @@ script = ExtResource("6_player_manager")
 player_scene = ExtResource("5_player_networked")
 
 [node name="Coins" type="Node2D" parent="." unique_id=2093062999]
-
-[node name="Goal" parent="." unique_id=907730473 instance=ExtResource("4_goal")]
-position = Vector2(1050, 186)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=343623237]
 

@@ -5,7 +5,6 @@ enum Tool {
 	TILE_PLATFORM,
 	COIN,
 	SPAWN_POINT,
-	GOAL,
 	ERASE
 }
 
@@ -32,7 +31,6 @@ func _ready():
 		Tool.TILE_PLATFORM: $VBoxContainer/ToolButtons/PlatformButton,
 		Tool.COIN: $VBoxContainer/ToolButtons/CoinButton,
 		Tool.SPAWN_POINT: $VBoxContainer/ToolButtons/SpawnButton,
-		Tool.GOAL: $VBoxContainer/ToolButtons/GoalButton,
 		Tool.ERASE: $VBoxContainer/ToolButtons/EraseButton
 	}
 
@@ -80,8 +78,6 @@ func _place_tile_at_mouse() -> void:
 			_place_coin(tile_pos)
 		Tool.SPAWN_POINT:
 			_place_spawn_point(tile_pos)
-		Tool.GOAL:
-			_place_goal(tile_pos)
 
 func _erase_tile_at_mouse() -> void:
 	var tile_pos = _get_mouse_tile_pos()
@@ -94,10 +90,6 @@ func _place_coin(pos: Vector2i) -> void:
 func _place_spawn_point(pos: Vector2i) -> void:
 	var world_pos = tile_map.map_to_local(pos)
 	print("Placing spawn point at: ", world_pos)
-
-func _place_goal(pos: Vector2i) -> void:
-	var world_pos = tile_map.map_to_local(pos)
-	print("Placing goal at: ", world_pos)
 
 func _on_tool_selected(tool: int) -> void:
 	current_tool = tool

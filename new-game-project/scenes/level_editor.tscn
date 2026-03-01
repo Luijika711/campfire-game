@@ -57,10 +57,6 @@ text = "Coin (C)"
 layout_mode = 2
 text = "Spawn (S)"
 
-[node name="GoalButton" type="Button" parent="VBoxContainer/ToolButtons"]
-layout_mode = 2
-text = "Goal (L)"
-
 [node name="EraseButton" type="Button" parent="VBoxContainer/ToolButtons"]
 layout_mode = 2
 text = "Erase (E)"

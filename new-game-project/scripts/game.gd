@@ -11,7 +11,6 @@ const PLAYER_SCENE := preload("res://scenes/player.tscn")
 @onready var show_qr_button: Button = $CanvasLayer/UI/ShowQRButton
 @onready var level_container: Node2D = $LevelContainer
 @onready var coins: Node2D = $Coins
-@onready var goal: Node2D = $Goal
 @onready var game_camera: Camera2D = $GameCamera
 @onready var health_bar: ProgressBar = $CanvasLayer/UI/HealthBar
 @onready var health_label: Label = $CanvasLayer/UI/HealthLabel
@@ -107,18 +106,8 @@ func _load_map(map_id: String) -> void:
 			if marker is Marker2D:
 				coin_positions.append(marker.position)
 
-	# Read goal position
-	var goal_marker = level.get_node_or_null("GoalPosition")
-	var goal_pos := Vector2(1050, 186)
-	if goal_marker is Marker2D:
-		goal_pos = goal_marker.position
-
 	# Spawn coins
 	_spawn_coins(coin_positions)
-
-	# Position goal
-	if goal != null:
-		goal.position = goal_pos
 
 	print("Level loaded: %s" % map_id)
 
